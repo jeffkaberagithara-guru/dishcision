@@ -31,7 +31,6 @@ export const AddFoodItemModal: React.FC<AddFoodItemModalProps> = ({
   const [name, setName] = useState('');
   const [category, setCategory] = useState<FoodCategory>('staple');
   const [inStock, setInStock] = useState(true);
-  const [isStaple, setIsStaple] = useState(false);
   const [parentId, setParentId] = useState('');
 
   const filteredParents = useMemo(() => {
@@ -46,14 +45,12 @@ export const AddFoodItemModal: React.FC<AddFoodItemModalProps> = ({
       name: name.trim(),
       category,
       inStock,
-      isStaple,
       parentId: parentId || undefined,
     });
 
     setName('');
     setCategory('staple');
     setInStock(true);
-    setIsStaple(false);
     setParentId('');
     onClose();
   };
@@ -134,16 +131,6 @@ export const AddFoodItemModal: React.FC<AddFoodItemModalProps> = ({
               className="w-4 h-4 rounded-[2px] accent-[#8A9B84]"
             />
             <span>Currently in stock in the kitchen</span>
-          </label>
-
-          <label className="flex items-center gap-2 text-xs font-sans text-[#6E6A61] cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isStaple}
-              onChange={(e) => setIsStaple(e.target.checked)}
-              className="w-4 h-4 rounded-[2px] accent-[#8A9B84]"
-            />
-            <span>Mark as frequent household staple</span>
           </label>
         </div>
 

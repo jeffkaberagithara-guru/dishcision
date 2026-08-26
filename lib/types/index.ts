@@ -34,7 +34,6 @@ export interface FoodItem {
   name: string;
   category: FoodCategory;
   inStock: boolean;
-  isStaple?: boolean;
   tags?: string[];
   unit?: string;
   parentId?: string;

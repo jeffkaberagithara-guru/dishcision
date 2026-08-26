@@ -163,7 +163,6 @@ export default function MyFoodPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
-                        {item.isStaple && <Badge variant="muted" size="sm">STAPLE</Badge>}
                         {sectionSource === 'personal' && (
                           <button
                             onClick={() => { setDeleteConfirmId(item.id); setDeleteType('food'); }}
@@ -365,7 +364,6 @@ export default function MyFoodPage() {
                               </button>
                               <span className={`text-sm font-sans truncate ${item.inStock ? 'text-[#171714]' : 'text-[#6E6A61] line-through'}`}>{item.name}</span>
                             </div>
-                            {item.isStaple && <Badge variant="muted" size="sm">STAPLE</Badge>}
                           </div>
                         ))}
                       </div>
