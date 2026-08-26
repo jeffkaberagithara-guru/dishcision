@@ -51,7 +51,6 @@ export interface Meal {
   isQuick?: boolean;
   isFavorite?: boolean;
   isExcluded?: boolean;
-  image?: string;
   lastCooked?: string;
   cookingTimeMinutes?: number;
   source: DataSource;
@@ -66,7 +65,7 @@ export interface DailyPlanSlot {
 }
 
 export interface DailyPlan {
-  date: string; // YYYY-MM-DD
+  date: string;
   breakfast: DailyPlanSlot;
   lunch: DailyPlanSlot;
   dinner: DailyPlanSlot;
@@ -86,7 +85,7 @@ export interface HistoryEntry {
   mealId: string;
   mealName: string;
   plateSummary: string;
-  cookedAt: string; // ISO timestamp
+  cookedAt: string;
   rating?: number;
   hadLeftovers?: boolean;
 }

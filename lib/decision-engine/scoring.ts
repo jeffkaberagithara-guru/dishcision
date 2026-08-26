@@ -8,27 +8,77 @@ export function calculateRecencyPenalty(lastCookedStr?: string, targetDate: Date
   const diffTime = targetDate.getTime() - lastCooked.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays <= 0) return 40; // Cooked today
-  if (diffDays === 1) return 30; // Cooked yesterday
+  if (diffDays <= 0) return 50;  // Cooked today — strong avoid
+  if (diffDays === 1) return 35; // Yesterday — still heavy
   if (diffDays === 2) return 20;
   if (diffDays === 3) return 10;
-  if (diffDays <= 7) return 5;
+  if (diffDays <= 5) return 5;
   return 0;
 }
 
+/**
+ * Balance score: rewards meals with diverse plate roles.
+ * A balanced plate has: STAPLE + PROTEIN/LEGUME + VEGETABLE/SALAD
+ * Max 30 points for a fully balanced plate.
+ */
 export function calculateBalanceScore(meal: Meal): number {
   const roles = new Set(meal.plate.map((p) => p.role));
   const hasStaple = roles.has('STAPLE');
-  const hasProteinOrLegume = roles.has('PROTEIN') || roles.has('LEGUME');
-  const hasVegOrSalad = roles.has('VEGETABLE') || roles.has('SALAD');
+  const hasProtein = roles.has('PROTEIN');
+  const hasLegume = roles.has('LEGUME');
+  const hasVegetable = roles.has('VEGETABLE');
+  const hasSalad = roles.has('SALAD');
+  const hasFruit = roles.has('FRUIT');
+  const hasBeverage = roles.has('BEVERAGE');
 
-  if (hasStaple && hasProteinOrLegume && hasVegOrSalad) {
-    return 25; // Complete balanced plate
+  let score = 0;
+
+  // Core balanced plate: STAPLE + (PROTEIN or LEGUME) + (VEGETABLE or SALAD)
+  if (hasStaple) score += 8;
+  if (hasProtein || hasLegume) score += 8;
+  if (hasVegetable || hasSalad) score += 8;
+
+  // Bonus for completeness
+  if (hasStaple && (hasProtein || hasLegume) && (hasVegetable || hasSalad)) {
+    score += 6; // Full balanced plate bonus
   }
-  if ((hasStaple && hasProteinOrLegume) || (hasStaple && hasVegOrSalad) || (hasProteinOrLegume && hasVegOrSalad)) {
-    return 15; // 2 out of 3 components
+
+  // Micro-nutrition bonuses
+  if (hasFruit) score += 3;
+  if (hasBeverage && meal.mealType === 'breakfast') score += 2;
+
+  return Math.min(score, 30);
+}
+
+/**
+ * Cross-meal diversity score for day planning.
+ * Penalizes using the same protein or staple across meals.
+ */
+export function calculateCrossMealPenalty(
+  meal: Meal,
+  usedProteins: Set<string>,
+  usedStaples: Set<string>,
+): number {
+  let penalty = 0;
+
+  for (const comp of meal.plate) {
+    const nameLower = comp.name.toLowerCase();
+
+    if ((comp.role === 'PROTEIN' || comp.role === 'LEGUME') && usedProteins.has(nameLower)) {
+      penalty += 25;
+    }
+    if (comp.role === 'STAPLE' && usedStaples.has(nameLower)) {
+      penalty += 15;
+    }
+    if (comp.role === 'PROTEIN' || comp.role === 'LEGUME') {
+      usedProteins.add(nameLower);
+    }
+    if (comp.role === 'STAPLE') {
+      usedStaples.add(nameLower);
+    }
   }
-  return 5;
+
+  return penalty;
 }
 
 export function scoreMealCandidate(
@@ -36,12 +86,10 @@ export function scoreMealCandidate(
   foodItems: FoodItem[],
   criteria: DecisionCriteria = {}
 ): ScoredMealCandidate | null {
-  // 1. Exclusions
   if (meal.isExcluded) return null;
   if (criteria.neverMealIds?.includes(meal.id)) return null;
   if (criteria.excludedMealIds?.includes(meal.id)) return null;
 
-  const targetDate = criteria.targetDate || new Date();
   const activeStockMap = new Map<string, boolean>();
 
   if (criteria.customAvailableFoodIds && criteria.customAvailableFoodIds.length > 0) {
@@ -50,7 +98,6 @@ export function scoreMealCandidate(
     foodItems.forEach((item) => activeStockMap.set(item.id, item.inStock));
   }
 
-  // 2. Availability checking
   let matchedCount = 0;
   const missingItemNames: string[] = [];
 
@@ -59,11 +106,15 @@ export function scoreMealCandidate(
     if (comp.foodItemId) {
       isInStock = !!activeStockMap.get(comp.foodItemId);
     } else {
-      // Find by matching item name in food items
       const matched = foodItems.find(
-        (f) => f.name.toLowerCase().includes(comp.name.toLowerCase()) || comp.name.toLowerCase().includes(f.name.toLowerCase())
+        (f) => f.name.toLowerCase().includes(comp.name.toLowerCase()) ||
+               comp.name.toLowerCase().includes(f.name.toLowerCase())
       );
-      isInStock = matched ? (criteria.customAvailableFoodIds ? criteria.customAvailableFoodIds.includes(matched.id) : matched.inStock) : true;
+      isInStock = matched
+        ? (criteria.customAvailableFoodIds
+            ? criteria.customAvailableFoodIds.includes(matched.id)
+            : matched.inStock)
+        : true;
     }
 
     if (isInStock || comp.isOptional) {
@@ -80,20 +131,24 @@ export function scoreMealCandidate(
     return null;
   }
 
-  // Base score: 100 max
-  const availabilityScore = availabilityRatio * 50;
-  const balanceScore = calculateBalanceScore(meal);
-  const recencyPenalty = calculateRecencyPenalty(meal.lastCooked, targetDate);
+  // === SCORING (max ~100) ===
 
+  // 1. Availability (0-50): are ingredients available?
+  const availabilityScore = availabilityRatio * 50;
+
+  // 2. Nutritional balance (0-30): diverse plate roles
+  const balanceScore = calculateBalanceScore(meal);
+
+  // 3. Meal type affinity (0-20, or -30 penalty)
   let typeAffinity = 0;
   if (criteria.mealType && criteria.mealType !== 'any') {
     if (meal.mealType === criteria.mealType || meal.mealType === 'any' || !meal.mealType) {
       typeAffinity = 15;
     } else {
-      typeAffinity = -30; // Strong penalty for wrong meal type (e.g. breakfast for dinner)
+      typeAffinity = -30;
     }
 
-    // Taxonomy-based food appropriateness: bonus if all plate foods are appropriate for target meal
+    // Taxonomy food appropriateness bonus
     const plateFoodAppropriateness = meal.plate.reduce((acc, comp) => {
       if (!comp.foodItemId) return acc;
       const variant = FOOD_VARIANTS.find((v) => v.id === comp.foodItemId);
@@ -104,17 +159,28 @@ export function scoreMealCandidate(
     }, 0);
     const totalWithFoodIds = meal.plate.filter((p) => p.foodItemId).length || 1;
     const appropriatenessRatio = plateFoodAppropriateness / totalWithFoodIds;
-    typeAffinity += Math.round(appropriatenessRatio * 10); // up to +10 bonus
+    typeAffinity += Math.round(appropriatenessRatio * 10);
   }
 
-  let isQuickBonus = 0;
-  if (criteria.keepItEasy && meal.isQuick) {
-    isQuickBonus = 15;
-  }
+  // 4. Quick meal bonus (0-15)
+  const isQuickBonus = (criteria.keepItEasy && meal.isQuick) ? 15 : 0;
 
+  // 5. Favorite bonus (0-5)
   const favoriteBonus = meal.isFavorite ? 5 : 0;
 
-  const totalScore = availabilityScore + balanceScore + typeAffinity + isQuickBonus + favoriteBonus - recencyPenalty;
+  // 6. Recency penalty (-50 to 0)
+  const recencyPenalty = calculateRecencyPenalty(meal.lastCooked);
+
+  // 7. Cross-meal variety penalty (if provided)
+  const crossMealPenalty = criteria.usedProteins || criteria.usedStaples
+    ? calculateCrossMealPenalty(
+        meal,
+        criteria.usedProteins || new Set(),
+        criteria.usedStaples || new Set(),
+      )
+    : 0;
+
+  const totalScore = availabilityScore + balanceScore + typeAffinity + isQuickBonus + favoriteBonus - recencyPenalty - crossMealPenalty;
 
   return {
     meal,
@@ -141,7 +207,6 @@ export function rankMealCandidates(
     }
   }
 
-  // Sort descending by score
   candidates.sort((a, b) => b.score - a.score);
   return candidates;
 }

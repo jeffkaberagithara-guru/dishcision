@@ -3,14 +3,16 @@ import { rankMealCandidates } from './scoring';
 import { generateFallbackMeal } from './fallbacks';
 import { generateLeftoverBreakfast } from './leftovers';
 
-function getDominantProtein(meal: Meal): string | null {
-  const proteinComp = meal.plate.find((p) => p.role === 'PROTEIN' || p.role === 'LEGUME');
-  return proteinComp ? proteinComp.name.toLowerCase() : null;
+function getMealProteins(meal: Meal): string[] {
+  return meal.plate
+    .filter((p) => p.role === 'PROTEIN' || p.role === 'LEGUME')
+    .map((p) => p.name.toLowerCase());
 }
 
-function getDominantStaple(meal: Meal): string | null {
-  const stapleComp = meal.plate.find((p) => p.role === 'STAPLE');
-  return stapleComp ? stapleComp.name.toLowerCase() : null;
+function getMealStaples(meal: Meal): string[] {
+  return meal.plate
+    .filter((p) => p.role === 'STAPLE')
+    .map((p) => p.name.toLowerCase());
 }
 
 export function generateDailyPlan(
@@ -23,15 +25,23 @@ export function generateDailyPlan(
 ): DailyPlan {
   const dateStr = targetDate.toISOString().split('T')[0];
   const usedMealIds = new Set<string>();
+  const usedProteins = new Set<string>();
+  const usedStaples = new Set<string>();
+
+  // Helper: record proteins/staples from a chosen meal
+  function recordMeal(meal: Meal) {
+    usedMealIds.add(meal.id);
+    getMealProteins(meal).forEach((p) => usedProteins.add(p));
+    getMealStaples(meal).forEach((s) => usedStaples.add(s));
+  }
 
   // 1. BREAKFAST
   let breakfastSlot: DailyPlanSlot;
 
   if (currentPlan?.breakfast?.isLocked && currentPlan.breakfast.meal) {
     breakfastSlot = currentPlan.breakfast;
-    usedMealIds.add(breakfastSlot.meal.id);
+    recordMeal(breakfastSlot.meal);
   } else {
-    // Check for leftover breakfast first
     const leftover = generateLeftoverBreakfast(recentHistory, allMeals, settings);
     if (leftover) {
       breakfastSlot = {
@@ -40,6 +50,7 @@ export function generateDailyPlan(
         isLeftover: true,
         isLocked: false,
       };
+      recordMeal(leftover.meal);
     } else {
       const breakfastCandidates = rankMealCandidates(allMeals, foodItems, {
         mealType: 'breakfast',
@@ -48,13 +59,13 @@ export function generateDailyPlan(
 
       if (breakfastCandidates.length > 0) {
         const chosen = breakfastCandidates[0].meal;
-        usedMealIds.add(chosen.id);
         breakfastSlot = {
           mealType: 'breakfast',
           meal: chosen,
           isLeftover: false,
           isLocked: false,
         };
+        recordMeal(chosen);
       } else {
         const fallback = generateFallbackMeal(
           foodItems.filter((i) => i.inStock),
@@ -66,32 +77,35 @@ export function generateDailyPlan(
           isLeftover: false,
           isLocked: false,
         };
+        recordMeal(fallback.meal);
       }
     }
   }
 
-  // 2. DINNER (Decided before lunch to prioritize the main dish of the day)
+  // 2. DINNER (decided before lunch to set the anchor)
   let dinnerSlot: DailyPlanSlot;
 
   if (currentPlan?.dinner?.isLocked && currentPlan.dinner.meal) {
     dinnerSlot = currentPlan.dinner;
-    usedMealIds.add(dinnerSlot.meal.id);
+    recordMeal(dinnerSlot.meal);
   } else {
     const dinnerCandidates = rankMealCandidates(allMeals, foodItems, {
       mealType: 'dinner',
       targetDate,
       excludedMealIds: Array.from(usedMealIds),
+      usedProteins: new Set(usedProteins),
+      usedStaples: new Set(usedStaples),
     });
 
     if (dinnerCandidates.length > 0) {
       const chosen = dinnerCandidates[0].meal;
-      usedMealIds.add(chosen.id);
       dinnerSlot = {
         mealType: 'dinner',
         meal: chosen,
         isLeftover: false,
         isLocked: false,
       };
+      recordMeal(chosen);
     } else {
       const fallback = generateFallbackMeal(
         foodItems.filter((i) => i.inStock),
@@ -103,45 +117,29 @@ export function generateDailyPlan(
         isLeftover: false,
         isLocked: false,
       };
+      recordMeal(fallback.meal);
     }
   }
 
-  // 3. LUNCH (Balanced against breakfast & dinner)
+  // 3. LUNCH (balanced against breakfast AND dinner — avoid protein/staple clashes)
   let lunchSlot: DailyPlanSlot;
 
   if (currentPlan?.lunch?.isLocked && currentPlan.lunch.meal) {
     lunchSlot = currentPlan.lunch;
   } else {
-    const dinnerProtein = getDominantProtein(dinnerSlot.meal);
-    const dinnerStaple = getDominantStaple(dinnerSlot.meal);
-
     const lunchCandidates = rankMealCandidates(allMeals, foodItems, {
       mealType: 'lunch',
       targetDate,
       excludedMealIds: Array.from(usedMealIds),
+      usedProteins: new Set(usedProteins),
+      usedStaples: new Set(usedStaples),
     });
 
-    // Try to find a lunch that doesn't clash with dinner's dominant protein/staple
-    let chosenLunch: Meal | null = null;
-
-    for (const cand of lunchCandidates) {
-      const p = getDominantProtein(cand.meal);
-      const s = getDominantStaple(cand.meal);
-      const isClash = (p && dinnerProtein && p === dinnerProtein) || (s && dinnerStaple && s === dinnerStaple);
-      if (!isClash) {
-        chosenLunch = cand.meal;
-        break;
-      }
-    }
-
-    if (!chosenLunch && lunchCandidates.length > 0) {
-      chosenLunch = lunchCandidates[0].meal;
-    }
-
-    if (chosenLunch) {
+    if (lunchCandidates.length > 0) {
+      const chosen = lunchCandidates[0].meal;
       lunchSlot = {
         mealType: 'lunch',
-        meal: chosenLunch,
+        meal: chosen,
         isLeftover: false,
         isLocked: false,
       };
@@ -173,18 +171,27 @@ export function regeneratePlanSlot(
   allMeals: Meal[],
   foodItems: FoodItem[]
 ): DailyPlan {
-  const otherSlotMeals = [
-    slotType !== 'breakfast' ? currentPlan.breakfast.meal.id : null,
-    slotType !== 'lunch' ? currentPlan.lunch.meal.id : null,
-    slotType !== 'dinner' ? currentPlan.dinner.meal.id : null,
-  ].filter(Boolean) as string[];
+  const otherSlots = (['breakfast', 'lunch', 'dinner'] as const).filter((s) => s !== slotType);
+
+  const usedProteins = new Set<string>();
+  const usedStaples = new Set<string>();
+
+  otherSlots.forEach((s) => {
+    const meal = currentPlan[s]?.meal;
+    if (meal) {
+      getMealProteins(meal).forEach((p) => usedProteins.add(p));
+      getMealStaples(meal).forEach((s2) => usedStaples.add(s2));
+    }
+  });
 
   const currentMealId = currentPlan[slotType].meal.id;
-  const exclusions = [...otherSlotMeals, currentMealId];
+  const exclusions = [...otherSlots.map((s) => currentPlan[s]?.meal?.id).filter(Boolean), currentMealId];
 
   const candidates = rankMealCandidates(allMeals, foodItems, {
     mealType: slotType,
     excludedMealIds: exclusions,
+    usedProteins,
+    usedStaples,
   });
 
   let newMeal: Meal;

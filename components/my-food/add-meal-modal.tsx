@@ -90,7 +90,6 @@ export const AddMealModal: React.FC<AddMealModalProps> = ({
       isQuick,
       cookingTimeMinutes: Number(cookingTime) || 30,
       plate: validPlate,
-      image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1200&auto=format&fit=crop',
     });
 
     setName('');

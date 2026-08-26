@@ -3,11 +3,13 @@ import { Meal, MealType } from '@/lib/types';
 export interface DecisionCriteria {
   mealType?: MealType;
   mustUseInStockOnly?: boolean;
-  keepItEasy?: boolean; // filter/boost quick meals
-  excludedMealIds?: string[]; // "Not Today" temporary skips
-  neverMealIds?: string[]; // "Never" permanent blacklist
+  keepItEasy?: boolean;
+  excludedMealIds?: string[];
+  neverMealIds?: string[];
   targetDate?: Date;
-  customAvailableFoodIds?: string[]; // Selected in "Use What I Have" modal
+  customAvailableFoodIds?: string[];
+  usedProteins?: Set<string>;
+  usedStaples?: Set<string>;
 }
 
 export interface ScoredMealCandidate {
