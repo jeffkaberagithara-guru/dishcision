@@ -99,20 +99,22 @@ export default function ShoppingPage() {
             placeholder="Add something you need"
             className="min-h-11 w-full border border-[#DCD5C9] bg-[#F7F3EC] px-3 text-sm rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
           />
-          <select
-            value={category}
-            onChange={(event) => setCategory(event.target.value as FoodCategory)}
-            className="min-h-11 border border-[#DCD5C9] bg-white px-3 text-sm rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
-          >
-            {CATEGORIES.map((value) => (
-              <option key={value} value={value}>
-                {CATEGORY_LABELS[value]}
-              </option>
-            ))}
-          </select>
-          <Button type="submit" variant="primary" size="md" className="gap-2">
-            <Plus className="w-4 h-4" /> Add item
-          </Button>
+          <div className="grid grid-cols-[1fr_auto] sm:grid-cols-none gap-3">
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value as FoodCategory)}
+              className="min-h-11 border border-[#DCD5C9] bg-white px-3 text-sm rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
+            >
+              {CATEGORIES.map((value) => (
+                <option key={value} value={value}>
+                  {CATEGORY_LABELS[value]}
+                </option>
+              ))}
+            </select>
+            <Button type="submit" variant="primary" size="md" className="gap-2">
+              <Plus className="w-4 h-4" /> Add item
+            </Button>
+          </div>
         </form>
 
         {/* Shopping list or empty state */}

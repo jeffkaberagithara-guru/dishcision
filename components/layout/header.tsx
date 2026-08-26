@@ -16,13 +16,17 @@ interface HeaderProps {
   isPublic?: boolean;
 }
 
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: "instant" });
+};
+
 export const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
   const pathname = usePathname();
 
   return (
     <header className="w-full border-b border-[#DCD5C9] bg-[#F7F3EC]/90 backdrop-blur-sm sticky top-0 z-40">
       <div className="container-editorial flex items-center justify-between h-16 md:h-20">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" onClick={scrollToTop} className="flex items-center gap-2">
           <span className="font-serif text-2xl md:text-3xl font-normal tracking-tight text-[#171714]">
             DISHCISION
           </span>
@@ -57,6 +61,7 @@ export const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
             <>
               <Link
                 href="/"
+                onClick={scrollToTop}
                 className={cn(
                   "flex items-center gap-1.5 hover:text-[#171714] transition-colors",
                   pathname === "/" && "text-[#171714] font-semibold",
@@ -67,6 +72,7 @@ export const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
               </Link>
               <Link
                 href="/app/plan"
+                onClick={scrollToTop}
                 className={cn(
                   "flex items-center gap-1.5 hover:text-[#171714] transition-colors",
                   pathname === "/app/plan" && "text-[#171714] font-semibold",
@@ -77,6 +83,7 @@ export const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
               </Link>
               <Link
                 href="/app/my-food"
+                onClick={scrollToTop}
                 className={cn(
                   "flex items-center gap-1.5 hover:text-[#171714] transition-colors",
                   pathname === "/app/my-food" && "text-[#171714] font-semibold",
@@ -87,6 +94,7 @@ export const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
               </Link>
               <Link
                 href="/app/shopping"
+                onClick={scrollToTop}
                 className={cn(
                   "flex items-center gap-1.5 hover:text-[#171714] transition-colors",
                   pathname === "/app/shopping" &&
@@ -98,6 +106,7 @@ export const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
               </Link>
               <Link
                 href="/app/settings"
+                onClick={scrollToTop}
                 className={cn(
                   "flex items-center gap-1.5 hover:text-[#171714] transition-colors",
                   pathname === "/app/settings" &&

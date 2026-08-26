@@ -6,6 +6,10 @@ import { usePathname } from "next/navigation";
 import { Sparkles, Calendar, Utensils, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: "instant" });
+};
+
 export const BottomNav: React.FC = () => {
   const pathname = usePathname();
 
@@ -24,6 +28,7 @@ export const BottomNav: React.FC = () => {
           <Link
             key={href}
             href={href}
+            onClick={scrollToTop}
             className={cn(
               "flex flex-col items-center gap-1 text-[10px] uppercase tracking-wider font-sans py-1 px-3 rounded",
               isActive
