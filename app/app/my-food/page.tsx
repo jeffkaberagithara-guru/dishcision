@@ -14,7 +14,7 @@ import { FoodCategory, FoodItem, Meal } from '@/lib/types';
 import {
   Plus, Search, Trash2, Star, Ban, Utensils, ChevronDown, ChevronUp,
   Package, Beef, Leaf, Bean, Salad, Apple, Coffee, ShoppingCart,
-  Edit3, Check, X, Zap, Lock,
+  Edit3, Check, X, Lock,
 } from 'lucide-react';
 
 const CATEGORY_CONFIG: Record<FoodCategory, { label: string; icon: React.ComponentType<{ className?: string }> }> = {
@@ -30,7 +30,7 @@ const CATEGORY_CONFIG: Record<FoodCategory, { label: string; icon: React.Compone
 
 const CATEGORY_ORDER: FoodCategory[] = ['staple', 'protein', 'legume', 'vegetable', 'salad', 'fruit', 'beverage', 'pantry'];
 
-type TabKey = 'foods' | 'stocked' | 'meals';
+type TabKey = 'foods' | 'meals';
 
 export default function MyFoodPage() {
   const {
@@ -68,15 +68,6 @@ export default function MyFoodPage() {
   const defaultMeals = useMemo(() => filteredMeals.filter((m) => m.source === 'default'), [filteredMeals]);
   const personalMeals = useMemo(() => filteredMeals.filter((m) => m.source === 'personal'), [filteredMeals]);
 
-  const groupedByCategory = useMemo(() => {
-    const groups: Record<FoodCategory, FoodItem[]> = {
-      staple: [], protein: [], vegetable: [], legume: [],
-      salad: [], fruit: [], beverage: [], pantry: [],
-    };
-    filteredFoodItems.forEach((item) => { if (groups[item.category]) groups[item.category].push(item); });
-    return groups;
-  }, [filteredFoodItems]);
-
   const toggleCategory = (cat: FoodCategory) => {
     setExpandedCategories((prev) => {
       const next = new Set(prev);
@@ -110,8 +101,6 @@ export default function MyFoodPage() {
     );
   }
 
-  const inStockCount = foodItems.filter((f) => f.inStock).length;
-
   const renderFoodSection = (items: FoodItem[], sectionLabel: string, sectionSource: 'default' | 'personal') => {
     if (items.length === 0) return null;
     return (
@@ -140,7 +129,7 @@ export default function MyFoodPage() {
                   <span className="text-xs uppercase tracking-[0.15em] font-sans font-semibold text-[#171714]">
                     {config.label}
                   </span>
-                  <Badge variant="muted" size="sm">{catItems.length}</Badge>
+                  <Badge variant="muted" size="sm">{catItems.filter((i) => i.inStock).length}/{catItems.length}</Badge>
                 </div>
                 {isExpanded ? <ChevronUp className="w-4 h-4 text-[#6E6A61]" /> : <ChevronDown className="w-4 h-4 text-[#6E6A61]" />}
               </button>
@@ -288,7 +277,6 @@ export default function MyFoodPage() {
         <div className="flex items-center gap-1 border-b border-[#DCD5C9] overflow-x-auto">
           {([
             { key: 'foods' as TabKey, label: 'FOODS', count: foodItems.length },
-            { key: 'stocked' as TabKey, label: 'AVAILABLE NOW', count: inStockCount },
             { key: 'meals' as TabKey, label: 'MEALS', count: meals.length },
           ]).map((tab) => (
             <button key={tab.key} onClick={() => setActiveTab(tab.key)}
@@ -303,6 +291,10 @@ export default function MyFoodPage() {
         {/* FOODS TAB */}
         {activeTab === 'foods' && (
           <div className="space-y-8">
+            <div className="p-4 bg-white border border-[#DCD5C9] rounded-[2px] flex items-center gap-3">
+              <Check className="w-4 h-4 text-[#8A9B84] shrink-0" />
+              <p className="text-xs text-[#6E6A61] font-sans">Toggle the checkbox on each food to mark what&apos;s in stock. Unchecked items won&apos;t appear in your DISHCISION.</p>
+            </div>
             {filteredFoodItems.length === 0 ? (
               <div className="p-12 bg-white border border-[#DCD5C9] rounded-[2px] text-center space-y-4">
                 <Package className="w-10 h-10 text-[#DCD5C9] mx-auto" />
@@ -316,61 +308,6 @@ export default function MyFoodPage() {
                 {personalFoods.length > 0 && <div className="border-t border-[#DCD5C9] pt-6" />}
                 {renderFoodSection(personalFoods, 'My Foods', 'personal')}
               </>
-            )}
-          </div>
-        )}
-
-        {/* AVAILABLE NOW TAB */}
-        {activeTab === 'stocked' && (
-          <div className="space-y-4">
-            <div className="p-4 bg-white border border-[#DCD5C9] rounded-[2px] flex items-center gap-3">
-              <Zap className="w-4 h-4 text-[#8A9B84] shrink-0" />
-              <p className="text-xs text-[#6E6A61] font-sans">Quick toggle what&apos;s in stock right now. Unchecked items won&apos;t appear in your DISHCISION.</p>
-            </div>
-            {filteredFoodItems.length === 0 ? (
-              <div className="p-12 bg-white border border-[#DCD5C9] rounded-[2px] text-center space-y-4">
-                <Package className="w-10 h-10 text-[#DCD5C9] mx-auto" />
-                <h2 className="font-serif text-2xl text-[#171714]">No foods in your library.</h2>
-              </div>
-            ) : (
-              CATEGORY_ORDER.map((cat) => {
-                const items = groupedByCategory[cat];
-                if (items.length === 0) return null;
-                const config = CATEGORY_CONFIG[cat];
-                const Icon = config.icon;
-                const isExpanded = expandedCategories.has(cat);
-                const inStockInCat = items.filter((i) => i.inStock).length;
-                return (
-                  <div key={cat} className="bg-white border border-[#DCD5C9] rounded-[2px] overflow-hidden">
-                    <button onClick={() => toggleCategory(cat)}
-                      className="w-full px-4 py-2.5 flex items-center justify-between hover:bg-[#F7F3EC]/50 transition-colors cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <Icon className="w-4 h-4 text-[#6E6A61]" />
-                        <span className="text-xs uppercase tracking-[0.15em] font-sans font-semibold text-[#171714]">{config.label}</span>
-                        <Badge variant="muted" size="sm">{inStockInCat}/{items.length}</Badge>
-                      </div>
-                      {isExpanded ? <ChevronUp className="w-4 h-4 text-[#6E6A61]" /> : <ChevronDown className="w-4 h-4 text-[#6E6A61]" />}
-                    </button>
-                    {isExpanded && (
-                      <div className="border-t border-[#DCD5C9] divide-y divide-[#DCD5C9]/50">
-                        {items.map((item) => (
-                          <div key={item.id} className="px-4 py-3 flex items-center justify-between gap-3 hover:bg-[#F7F3EC]/30 transition-colors">
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <button onClick={() => toggleInStock(item.id)}
-                                className={`w-5 h-5 rounded-[2px] border flex items-center justify-center shrink-0 cursor-pointer transition-colors ${
-                                  item.inStock ? 'bg-[#8A9B84] border-[#8A9B84] text-white' : 'border-[#DCD5C9] bg-white hover:border-[#8A9B84]/50'
-                                }`} title={item.inStock ? 'Mark out of stock' : 'Mark in stock'}>
-                                {item.inStock && <Check className="w-3 h-3" />}
-                              </button>
-                              <span className={`text-sm font-sans truncate ${item.inStock ? 'text-[#171714]' : 'text-[#6E6A61] line-through'}`}>{item.name}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })
             )}
           </div>
         )}
