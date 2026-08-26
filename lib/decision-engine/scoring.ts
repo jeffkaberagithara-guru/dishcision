@@ -207,6 +207,11 @@ export function rankMealCandidates(
     }
   }
 
-  candidates.sort((a, b) => b.score - a.score);
+  candidates.sort((a, b) => {
+    const diff = b.score - a.score;
+    if (diff !== 0) return diff;
+    // Shuffle same-scored candidates for variety
+    return Math.random() - 0.5;
+  });
   return candidates;
 }

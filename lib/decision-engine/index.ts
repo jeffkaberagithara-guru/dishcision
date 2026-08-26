@@ -33,7 +33,6 @@ export function makeDishcision(
     };
   }
 
-  // If no candidates matched constraints, generate fallback
   const inStock = criteria.customAvailableFoodIds
     ? foodItems.filter((f) => criteria.customAvailableFoodIds!.includes(f.id))
     : foodItems.filter((f) => f.inStock);

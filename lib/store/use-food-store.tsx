@@ -261,8 +261,16 @@ export const FoodStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Decision Operations
   const makeNewDecision = useCallback(
     (options: DecisionCriteria = {}) => {
+      const excludeCurrent = currentDecision
+        ? [currentDecision.meal.id]
+        : [];
+
       const mergedCriteria: DecisionCriteria = {
-        excludedMealIds: [...temporaryExcludedMealIds, ...(options.excludedMealIds || [])],
+        excludedMealIds: [
+          ...excludeCurrent,
+          ...temporaryExcludedMealIds,
+          ...(options.excludedMealIds || []),
+        ],
         keepItEasy: options.keepItEasy ?? settings.keepItEasyDefault,
         ...options,
       };
@@ -271,7 +279,7 @@ export const FoodStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setCurrentDecision(result);
       return result;
     },
-    [meals, foodItems, temporaryExcludedMealIds, settings]
+    [meals, foodItems, temporaryExcludedMealIds, settings, currentDecision]
   );
 
   const acceptCurrentDecision = useCallback(
