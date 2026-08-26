@@ -58,7 +58,14 @@ export const AddMealModal: React.FC<AddMealModalProps> = ({
 
   const handleUpdateComponent = (index: number, updates: Partial<PlateComponent>) => {
     setPlate((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, ...updates } : item))
+      prev.map((item, i) => {
+        if (i !== index) return item;
+        const next = { ...item, ...updates };
+        if (updates.role && updates.role !== item.role) {
+          next.foodItemId = undefined;
+        }
+        return next;
+      })
     );
   };
 
