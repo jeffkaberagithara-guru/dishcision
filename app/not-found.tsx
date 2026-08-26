@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function NotFound() {
   return (
@@ -17,18 +18,9 @@ export default function NotFound() {
         <p className="font-serif italic text-lg text-[#6E6A61] max-w-md">
           We couldn&apos;t find the page you&apos;re looking for. Let&apos;s get you back to deciding what to eat.
         </p>
-        <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
-          <Link
-            href="/app/today"
-            className="inline-flex items-center justify-center font-sans font-medium rounded-[2px] transition-all duration-200 text-xs md:text-sm uppercase tracking-widest px-8 py-4 min-h-[52px] bg-[#171714] text-[#F7F3EC] hover:bg-[#2A2925] active:bg-[#11110F] border border-transparent shadow-sm"
-          >
-            BACK TO TODAY
-          </Link>
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center font-sans font-medium rounded-[2px] transition-all duration-200 text-xs uppercase tracking-widest px-6 py-3 min-h-[46px] bg-transparent border border-[#171714] text-[#171714] hover:bg-[#171714]/5 active:bg-[#171714]/10"
-          >
-            RETURN HOME
+        <div className="pt-4">
+          <Link href="/">
+            <Button variant="primary" size="hero">DECIDE NOW</Button>
           </Link>
         </div>
       </main>

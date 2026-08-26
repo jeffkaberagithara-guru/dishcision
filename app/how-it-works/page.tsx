@@ -53,7 +53,7 @@ export default function HowItWorksPage() {
         </div>
 
         <div className="pt-8">
-          <Link href="/app/today">
+          <Link href="/">
             <Button variant="primary" size="hero">
               Get Started Now
             </Button>

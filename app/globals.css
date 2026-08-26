@@ -19,8 +19,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
-    selection-background-color: #8A9B84;
-    selection-color: #FFFFFF;
   }
 
   h1, h2, h3, .font-serif-editorial {
