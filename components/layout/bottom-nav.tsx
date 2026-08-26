@@ -10,7 +10,7 @@ export const BottomNav: React.FC = () => {
   const pathname = usePathname();
 
   const links = [
-    { href: "/app/today", label: "Today", icon: Sparkles },
+    { href: "/", label: "Decide", icon: Sparkles },
     { href: "/app/plan", label: "Plan", icon: Calendar },
     { href: "/app/my-food", label: "My Food", icon: Utensils },
     { href: "/app/shopping", label: "Shopping", icon: ShoppingBag },
@@ -19,7 +19,7 @@ export const BottomNav: React.FC = () => {
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#F7F3EC] border-t border-[#DCD5C9] px-4 py-2 flex justify-around items-center">
       {links.map(({ href, label, icon: Icon }) => {
-        const isActive = pathname === href;
+        const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
         return (
           <Link
             key={href}

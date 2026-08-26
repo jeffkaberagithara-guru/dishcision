@@ -37,6 +37,7 @@ export function generateLeftoverBreakfast(
     image: originalMeal?.image || 'https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=1200&auto=format&fit=crop',
     cookingTimeMinutes: 10,
     tags: ['leftover', 'zero-waste', 'quick-morning'],
+    source: 'default',
     plate: originalMeal
       ? [
           ...originalMeal.plate.filter((p) => p.role === 'STAPLE' || p.role === 'PROTEIN' || p.role === 'LEGUME'),

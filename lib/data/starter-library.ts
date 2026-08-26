@@ -2,50 +2,50 @@ import { FoodItem, Meal } from '@/lib/types';
 
 export const STARTER_FOOD_ITEMS: FoodItem[] = [
   // Staples
-  { id: 'f-1', name: 'Ugali Flour (Maize Flour)', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-ugali' },
-  { id: 'f-2', name: 'Pishori Rice', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-rice' },
-  { id: 'f-3', name: 'Irish Potatoes', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-potato' },
-  { id: 'f-4', name: 'Nduma (Arrowroots)', category: 'staple', inStock: true, isStaple: false, parentId: 'fp-roots' },
-  { id: 'f-5', name: 'Ngwaci (Sweet Potatoes)', category: 'staple', inStock: true, isStaple: false, parentId: 'fp-roots' },
-  { id: 'f-6', name: 'Wheat Flour / Chapati Flour', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-bread' },
-  { id: 'f-7', name: 'Fresh Bread', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-bread' },
-  { id: 'f-8', name: 'Githeri Maize (Boiled)', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-githeri' },
+  { id: 'f-1', name: 'Ugali Flour (Maize Flour)', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-ugali', source: 'default' },
+  { id: 'f-2', name: 'Pishori Rice', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-rice', source: 'default' },
+  { id: 'f-3', name: 'Irish Potatoes', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-potato', source: 'default' },
+  { id: 'f-4', name: 'Nduma (Arrowroots)', category: 'staple', inStock: true, isStaple: false, parentId: 'fp-roots', source: 'default' },
+  { id: 'f-5', name: 'Ngwaci (Sweet Potatoes)', category: 'staple', inStock: true, isStaple: false, parentId: 'fp-roots', source: 'default' },
+  { id: 'f-6', name: 'Wheat Flour / Chapati Flour', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-bread', source: 'default' },
+  { id: 'f-7', name: 'Fresh Bread', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-bread', source: 'default' },
+  { id: 'f-8', name: 'Githeri Maize (Boiled)', category: 'staple', inStock: true, isStaple: true, parentId: 'fp-githeri', source: 'default' },
 
   // Proteins
-  { id: 'f-9', name: 'Beef Stew Meat', category: 'protein', inStock: true, isStaple: true, parentId: 'fp-beef' },
-  { id: 'f-10', name: 'Minced Beef', category: 'protein', inStock: true, isStaple: false, parentId: 'fp-beef' },
-  { id: 'f-11', name: 'Pork Meat / Pork Chops', category: 'protein', inStock: true, isStaple: false, parentId: 'fp-pork' },
-  { id: 'f-12', name: 'Nyama Choma (Goat / Beef)', category: 'protein', inStock: false, isStaple: false, parentId: 'fp-beef' },
-  { id: 'f-13', name: 'Fresh Eggs', category: 'protein', inStock: true, isStaple: true, parentId: 'fp-eggs' },
-  { id: 'f-14', name: 'Sausages', category: 'protein', inStock: true, isStaple: false, parentId: 'fp-sausages' },
-  { id: 'f-15', name: 'Bacon', category: 'protein', inStock: false, isStaple: false, parentId: 'fp-sausages' },
+  { id: 'f-9', name: 'Beef Stew Meat', category: 'protein', inStock: true, isStaple: true, parentId: 'fp-beef', source: 'default' },
+  { id: 'f-10', name: 'Minced Beef', category: 'protein', inStock: true, isStaple: false, parentId: 'fp-beef', source: 'default' },
+  { id: 'f-11', name: 'Pork Meat / Pork Chops', category: 'protein', inStock: true, isStaple: false, parentId: 'fp-pork', source: 'default' },
+  { id: 'f-12', name: 'Nyama Choma (Goat / Beef)', category: 'protein', inStock: false, isStaple: false, parentId: 'fp-beef', source: 'default' },
+  { id: 'f-13', name: 'Fresh Eggs', category: 'protein', inStock: true, isStaple: true, parentId: 'fp-eggs', source: 'default' },
+  { id: 'f-14', name: 'Sausages', category: 'protein', inStock: true, isStaple: false, parentId: 'fp-sausages', source: 'default' },
+  { id: 'f-15', name: 'Bacon', category: 'protein', inStock: false, isStaple: false, parentId: 'fp-sausages', source: 'default' },
 
   // Legumes
-  { id: 'f-16', name: 'Ndengu (Green Grams)', category: 'legume', inStock: true, isStaple: true, parentId: 'fp-ndengu' },
-  { id: 'f-17', name: 'Yellow Beans (Kamande)', category: 'legume', inStock: true, isStaple: true, parentId: 'fp-beans' },
-  { id: 'f-18', name: 'Peas (Minji)', category: 'legume', inStock: true, isStaple: true, parentId: 'fp-peas' },
-  { id: 'f-19', name: 'Njogo Beans', category: 'legume', inStock: true, isStaple: false, parentId: 'fp-beans' },
+  { id: 'f-16', name: 'Ndengu (Green Grams)', category: 'legume', inStock: true, isStaple: true, parentId: 'fp-ndengu', source: 'default' },
+  { id: 'f-17', name: 'Yellow Beans (Kamande)', category: 'legume', inStock: true, isStaple: true, parentId: 'fp-beans', source: 'default' },
+  { id: 'f-18', name: 'Peas (Minji)', category: 'legume', inStock: true, isStaple: true, parentId: 'fp-peas', source: 'default' },
+  { id: 'f-19', name: 'Njogo Beans', category: 'legume', inStock: true, isStaple: false, parentId: 'fp-beans', source: 'default' },
 
   // Vegetables & Salads
-  { id: 'f-20', name: 'Sukuma Wiki (Collard Greens)', category: 'vegetable', inStock: true, isStaple: true, parentId: 'fp-sukuma' },
-  { id: 'f-21', name: 'Fresh Cabbage', category: 'vegetable', inStock: true, isStaple: true, parentId: 'fp-cabbage' },
-  { id: 'f-22', name: 'Spinach', category: 'vegetable', inStock: true, isStaple: true, parentId: 'fp-spinach' },
-  { id: 'f-23', name: 'Pumpkin Leaves (Kahurura)', category: 'vegetable', inStock: true, isStaple: false, parentId: 'fp-pumpkin-leaves' },
-  { id: 'f-24', name: 'Tomatoes', category: 'vegetable', inStock: true, isStaple: true, parentId: 'fp-tomato' },
-  { id: 'f-25', name: 'Red Onions', category: 'vegetable', inStock: true, isStaple: true, parentId: 'fp-onion' },
-  { id: 'f-26', name: 'Kachumbari (Fresh Salsa)', category: 'salad', inStock: true, isStaple: true, parentId: 'fp-kachumbari' },
-  { id: 'f-27', name: 'Coleslaw', category: 'salad', inStock: false, isStaple: false, parentId: 'fp-salad' },
-  { id: 'f-28', name: 'Garden Salad', category: 'salad', inStock: false, isStaple: false, parentId: 'fp-salad' },
+  { id: 'f-20', name: 'Sukuma Wiki (Collard Greens)', category: 'vegetable', inStock: true, isStaple: true, parentId: 'fp-sukuma', source: 'default' },
+  { id: 'f-21', name: 'Fresh Cabbage', category: 'vegetable', inStock: true, isStaple: true, parentId: 'fp-cabbage', source: 'default' },
+  { id: 'f-22', name: 'Spinach', category: 'vegetable', inStock: true, isStaple: true, parentId: 'fp-spinach', source: 'default' },
+  { id: 'f-23', name: 'Pumpkin Leaves (Kahurura)', category: 'vegetable', inStock: true, isStaple: false, parentId: 'fp-pumpkin-leaves', source: 'default' },
+  { id: 'f-24', name: 'Tomatoes', category: 'vegetable', inStock: true, isStaple: true, parentId: 'fp-tomato', source: 'default' },
+  { id: 'f-25', name: 'Red Onions', category: 'vegetable', inStock: true, isStaple: true, parentId: 'fp-onion', source: 'default' },
+  { id: 'f-26', name: 'Kachumbari (Fresh Salsa)', category: 'salad', inStock: true, isStaple: true, parentId: 'fp-kachumbari', source: 'default' },
+  { id: 'f-27', name: 'Coleslaw', category: 'salad', inStock: false, isStaple: false, parentId: 'fp-salad', source: 'default' },
+  { id: 'f-28', name: 'Garden Salad', category: 'salad', inStock: false, isStaple: false, parentId: 'fp-salad', source: 'default' },
 
   // Fruits & Pantry & Beverages
-  { id: 'f-29', name: 'Ripe Avocado', category: 'fruit', inStock: true, isStaple: true, parentId: 'fp-avocado' },
-  { id: 'f-30', name: 'Bananas', category: 'fruit', inStock: true, isStaple: false, parentId: 'fp-banana' },
-  { id: 'f-31', name: 'Kenyan Spiced Tea (Chai ya Tangawizi)', category: 'beverage', inStock: true, isStaple: true, parentId: 'fp-chai' },
-  { id: 'f-32', name: 'Fresh Cow Milk', category: 'beverage', inStock: true, isStaple: true, parentId: 'fp-chai' },
-  { id: 'f-33', name: 'Coffee', category: 'beverage', inStock: true, isStaple: true, parentId: 'fp-coffee' },
-  { id: 'f-34', name: 'Fresh Passion Juice', category: 'beverage', inStock: true, isStaple: false, parentId: 'fp-juice' },
-  { id: 'f-35', name: 'Kombucha / Tepache', category: 'beverage', inStock: false, isStaple: false, parentId: 'fp-juice' },
-  { id: 'f-36', name: 'Cooking Oil', category: 'pantry', inStock: true, isStaple: true },
+  { id: 'f-29', name: 'Ripe Avocado', category: 'fruit', inStock: true, isStaple: true, parentId: 'fp-avocado', source: 'default' },
+  { id: 'f-30', name: 'Bananas', category: 'fruit', inStock: true, isStaple: false, parentId: 'fp-banana', source: 'default' },
+  { id: 'f-31', name: 'Kenyan Spiced Tea (Chai ya Tangawizi)', category: 'beverage', inStock: true, isStaple: true, parentId: 'fp-chai', source: 'default' },
+  { id: 'f-32', name: 'Fresh Cow Milk', category: 'beverage', inStock: true, isStaple: true, parentId: 'fp-chai', source: 'default' },
+  { id: 'f-33', name: 'Coffee', category: 'beverage', inStock: true, isStaple: true, parentId: 'fp-coffee', source: 'default' },
+  { id: 'f-34', name: 'Fresh Passion Juice', category: 'beverage', inStock: true, isStaple: false, parentId: 'fp-juice', source: 'default' },
+  { id: 'f-35', name: 'Kombucha / Tepache', category: 'beverage', inStock: false, isStaple: false, parentId: 'fp-juice', source: 'default' },
+  { id: 'f-36', name: 'Cooking Oil', category: 'pantry', inStock: true, isStaple: true, source: 'default' },
 ];
 
 export const STARTER_MEALS: Meal[] = [
@@ -58,6 +58,7 @@ export const STARTER_MEALS: Meal[] = [
     image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?q=80&w=1200&auto=format&fit=crop',
     cookingTimeMinutes: 40,
     tags: ['classic', 'comfort', 'high-protein'],
+    source: 'default',
     plate: [
       { role: 'STAPLE', name: 'Ugali', foodItemId: 'f-1' },
       { role: 'PROTEIN', name: 'Beef Stew', foodItemId: 'f-9' },
@@ -73,6 +74,7 @@ export const STARTER_MEALS: Meal[] = [
     image: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=1200&auto=format&fit=crop',
     cookingTimeMinutes: 30,
     tags: ['balanced', 'vegetarian-friendly', 'budget-friendly'],
+    source: 'default',
     plate: [
       { role: 'STAPLE', name: 'Pishori Rice', foodItemId: 'f-2' },
       { role: 'LEGUME', name: 'Yellow Beans Curry', foodItemId: 'f-17' },
@@ -88,6 +90,7 @@ export const STARTER_MEALS: Meal[] = [
     image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=1200&auto=format&fit=crop',
     cookingTimeMinutes: 50,
     tags: ['festive', 'traditional', 'hearty'],
+    source: 'default',
     plate: [
       { role: 'STAPLE', name: 'Ndengu Mukimo', foodItemId: 'f-3' },
       { role: 'PROTEIN', name: 'Beef Stew', foodItemId: 'f-9' },
@@ -103,6 +106,7 @@ export const STARTER_MEALS: Meal[] = [
     image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1200&auto=format&fit=crop',
     cookingTimeMinutes: 25,
     tags: ['zero-fuss', 'fiber-rich', 'nutritious'],
+    source: 'default',
     plate: [
       { role: 'STAPLE', name: 'Peas Githeri', foodItemId: 'f-8' },
       { role: 'FRUIT', name: 'Sliced Avocado', foodItemId: 'f-29' },
@@ -118,6 +122,7 @@ export const STARTER_MEALS: Meal[] = [
     image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1200&auto=format&fit=crop',
     cookingTimeMinutes: 45,
     tags: ['weekend', 'celebratory', 'smoky'],
+    source: 'default',
     plate: [
       { role: 'STAPLE', name: 'Ugali', foodItemId: 'f-1' },
       { role: 'PROTEIN', name: 'Nyama Choma', foodItemId: 'f-12' },
@@ -133,6 +138,7 @@ export const STARTER_MEALS: Meal[] = [
     image: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200&auto=format&fit=crop',
     cookingTimeMinutes: 55,
     tags: ['heritage', 'nutritious'],
+    source: 'default',
     plate: [
       { role: 'STAPLE', name: 'Pumpkin Leaves Mukimo', foodItemId: 'f-23' },
       { role: 'PROTEIN', name: 'Pork Stew', foodItemId: 'f-11' },
@@ -148,6 +154,7 @@ export const STARTER_MEALS: Meal[] = [
     image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=1200&auto=format&fit=crop',
     cookingTimeMinutes: 20,
     tags: ['morning-energy', 'traditional-breakfast'],
+    source: 'default',
     plate: [
       { role: 'STAPLE', name: 'Boiled Nduma & Ngwaci', foodItemId: 'f-4' },
       { role: 'PROTEIN', name: 'Scrambled Eggs', foodItemId: 'f-13' },
@@ -163,6 +170,7 @@ export const STARTER_MEALS: Meal[] = [
     image: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?q=80&w=1200&auto=format&fit=crop',
     cookingTimeMinutes: 15,
     tags: ['quick-morning', 'classic-breakfast'],
+    source: 'default',
     plate: [
       { role: 'STAPLE', name: 'Toasted Bread', foodItemId: 'f-7' },
       { role: 'PROTEIN', name: 'Fried Eggs & Sausages', foodItemId: 'f-13' },
@@ -178,6 +186,7 @@ export const STARTER_MEALS: Meal[] = [
     image: 'https://images.unsplash.com/photo-1518013431117-eb1465fa5752?q=80&w=1200&auto=format&fit=crop',
     cookingTimeMinutes: 30,
     tags: ['family-favorite', 'casual'],
+    source: 'default',
     plate: [
       { role: 'STAPLE', name: 'Potato Wedges', foodItemId: 'f-3' },
       { role: 'PROTEIN', name: 'Minced Beef Sauce', foodItemId: 'f-10' },
@@ -193,6 +202,7 @@ export const STARTER_MEALS: Meal[] = [
     image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?q=80&w=1200&auto=format&fit=crop',
     cookingTimeMinutes: 25,
     tags: ['healthy', 'budget-friendly'],
+    source: 'default',
     plate: [
       { role: 'STAPLE', name: 'Pishori Rice', foodItemId: 'f-2' },
       { role: 'LEGUME', name: 'Spiced Ndengu Stew', foodItemId: 'f-16' },

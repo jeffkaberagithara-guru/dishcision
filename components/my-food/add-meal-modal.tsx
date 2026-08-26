@@ -11,7 +11,7 @@ import { Plus, Trash2 } from 'lucide-react';
 interface AddMealModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (meal: Omit<Meal, 'id'>) => void;
+  onAdd: (meal: Omit<Meal, 'id' | 'source'>) => void;
 }
 
 const ROLES: PlateRole[] = ['STAPLE', 'PROTEIN', 'LEGUME', 'VEGETABLE', 'SALAD', 'FRUIT', 'BEVERAGE'];

@@ -48,7 +48,7 @@ export const MealResultCard: React.FC<MealResultCardProps> = ({
       className="w-full bg-white border border-[#DCD5C9] rounded-[2px] overflow-hidden shadow-xs"
     >
       {/* Header Banner */}
-      <div className="p-6 md:p-8 border-b border-[#DCD5C9]/70 flex flex-wrap items-center justify-between gap-4">
+      <div className="p-4 sm:p-6 md:p-8 border-b border-[#DCD5C9]/70 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           {isFallback ? (
             <Badge variant="terracotta">PANTRY STANDBY</Badge>
@@ -72,72 +72,21 @@ export const MealResultCard: React.FC<MealResultCardProps> = ({
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 md:p-8 items-start">
-        {/* Left column: Text & Plate Breakdown */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="space-y-2">
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#171714] font-normal leading-tight">
-              {meal.name}
-            </h2>
-            {meal.description && (
-              <p className="text-sm text-[#6E6A61] font-sans leading-relaxed">
-                {meal.description}
-              </p>
-            )}
-          </div>
-
-          {isFallback && (
-            <div className="p-4 bg-[#EDE7DE]/50 border border-[#DCD5C9] rounded-[2px] flex items-start gap-3">
-              <Info className="w-4 h-4 text-[#B76546] shrink-0 mt-0.5" />
-              <div className="text-xs text-[#171714] leading-relaxed">
-                <span className="font-semibold block mb-0.5">We worked with what you have.</span>
-                {fallbackReason ||
-                  'Limited ingredients match this category. We generated an authentic baseline combination.'}
-              </div>
-            </div>
+      <div className="p-4 sm:p-6 md:p-8 space-y-6">
+        <div className="space-y-2">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#171714] font-normal leading-tight">
+            {meal.name}
+          </h2>
+          {meal.description && (
+            <p className="text-sm text-[#6E6A61] font-sans leading-relaxed">
+              {meal.description}
+            </p>
           )}
-
-          {/* Plate Breakdown — Editorial Style */}
-          <div className="space-y-3 pt-2">
-            <span className="text-[10px] uppercase tracking-widest text-[#171714] font-semibold block">
-              ON THE PLATE
-            </span>
-            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-              {meal.plate.map((item, idx) => (
-                <React.Fragment key={idx}>
-                  {idx > 0 && (
-                    <span className="text-[#DCD5C9] text-sm font-serif select-none">+</span>
-                  )}
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="font-serif text-base sm:text-lg text-[#171714] font-medium">
-                      {item.name}
-                    </span>
-                    <span className="text-[9px] uppercase tracking-widest text-[#6E6A61] font-sans">
-                      {item.role}
-                    </span>
-                  </span>
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-
-          {/* Leftovers prompt */}
-          <div className="pt-2 flex items-center gap-2">
-            <label className="flex items-center gap-2 text-xs font-sans text-[#6E6A61] cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={hadLeftovers}
-                onChange={(e) => setHadLeftovers(e.target.checked)}
-                className="w-4 h-4 rounded-[2px] accent-[#8A9B84] cursor-pointer"
-              />
-              <span>Plan leftovers from this meal for tomorrow morning&apos;s breakfast</span>
-            </label>
-          </div>
         </div>
 
-        {/* Right column: Image */}
-        <div className="lg:col-span-5">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2px] border border-[#DCD5C9] bg-[#EDE7DE]">
+        {/* Image — desktop only */}
+        {meal.image && (
+          <div className="hidden sm:block relative aspect-[4/3] w-full overflow-hidden rounded-[2px] border border-[#DCD5C9] bg-[#EDE7DE]">
             <Image
               src={
                 meal.image ||
@@ -147,14 +96,62 @@ export const MealResultCard: React.FC<MealResultCardProps> = ({
               fill
               priority
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 40vw"
+              sizes="(max-width: 768px) 0vw, 40vw"
             />
           </div>
+        )}
+
+        {isFallback && (
+          <div className="p-4 bg-[#EDE7DE]/50 border border-[#DCD5C9] rounded-[2px] flex items-start gap-3">
+            <Info className="w-4 h-4 text-[#B76546] shrink-0 mt-0.5" />
+            <div className="text-xs text-[#171714] leading-relaxed">
+              <span className="font-semibold block mb-0.5">We worked with what you have.</span>
+              {fallbackReason ||
+                'Limited ingredients match this category. We generated an authentic baseline combination.'}
+            </div>
+          </div>
+        )}
+
+        {/* Plate Breakdown — Editorial Style */}
+        <div className="space-y-3">
+          <span className="text-[10px] uppercase tracking-widest text-[#171714] font-semibold block">
+            ON THE PLATE
+          </span>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            {meal.plate.map((item, idx) => (
+              <React.Fragment key={idx}>
+                {idx > 0 && (
+                  <span className="text-[#DCD5C9] text-sm font-serif select-none">+</span>
+                )}
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="font-serif text-base sm:text-lg text-[#171714] font-medium">
+                    {item.name}
+                  </span>
+                  <span className="text-[9px] uppercase tracking-widest text-[#6E6A61] font-sans">
+                    {item.role}
+                  </span>
+                </span>
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+
+        {/* Leftovers prompt */}
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-2 text-xs font-sans text-[#6E6A61] cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={hadLeftovers}
+              onChange={(e) => setHadLeftovers(e.target.checked)}
+              className="w-4 h-4 rounded-[2px] accent-[#8A9B84] cursor-pointer"
+            />
+            <span>Plan leftovers for tomorrow morning&apos;s breakfast</span>
+          </label>
         </div>
       </div>
 
       {/* Action Footer */}
-      <div className="p-6 md:p-8 bg-[#F7F3EC]/50 border-t border-[#DCD5C9] space-y-4">
+      <div className="p-4 sm:p-6 md:p-8 bg-[#F7F3EC]/50 border-t border-[#DCD5C9] space-y-4">
         {/* Primary Row */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <Button
@@ -165,7 +162,8 @@ export const MealResultCard: React.FC<MealResultCardProps> = ({
             className="flex-1 gap-2"
           >
             <Check className="w-4 h-4" />
-            {isAccepted ? 'LOGGED TO HISTORY — ENJOY COOKING' : 'I WILL COOK THIS'}
+            <span className="hidden sm:inline">{isAccepted ? 'LOGGED TO HISTORY — ENJOY COOKING' : 'I WILL COOK THIS'}</span>
+            <span className="sm:hidden">{isAccepted ? 'LOGGED!' : 'COOK THIS'}</span>
           </Button>
 
           <Button
@@ -176,7 +174,8 @@ export const MealResultCard: React.FC<MealResultCardProps> = ({
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
-            DISHCISION AGAIN
+            <span className="hidden sm:inline">DISHCISION AGAIN</span>
+            <span className="sm:hidden">AGAIN</span>
           </Button>
         </div>
 
@@ -196,7 +195,8 @@ export const MealResultCard: React.FC<MealResultCardProps> = ({
               className="px-3 py-1.5 border border-[#DCD5C9] bg-white text-[#6E6A61] hover:text-[#B76546] rounded-[2px] transition-colors flex items-center gap-1.5 cursor-pointer text-xs"
             >
               <Ban className="w-3.5 h-3.5" />
-              <span>Don&apos;t Have Ingredients</span>
+              <span className="hidden sm:inline">Don&apos;t Have Ingredients</span>
+              <span className="sm:hidden">Missing</span>
             </button>
           </div>
 

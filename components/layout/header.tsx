@@ -31,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-6 md:gap-8 text-xs uppercase tracking-widest font-sans font-medium text-[#6E6A61]">
+        <nav className="hidden md:flex items-center gap-6 md:gap-8 text-xs uppercase tracking-widest font-sans font-medium text-[#6E6A61]">
           {isPublic ? (
             <>
               <Link
@@ -47,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
                 About
               </Link>
               <Link
-                href="/app/today"
+                href="/"
                 className="px-4 py-2 bg-[#171714] text-[#F7F3EC] rounded-[2px] hover:bg-[#2A2925] transition-colors text-xs font-sans tracking-widest uppercase"
               >
                 Enter App
@@ -56,14 +56,14 @@ export const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
           ) : (
             <>
               <Link
-                href="/app/today"
+                href="/"
                 className={cn(
                   "flex items-center gap-1.5 hover:text-[#171714] transition-colors",
-                  pathname === "/app/today" && "text-[#171714] font-semibold",
+                  pathname === "/" && "text-[#171714] font-semibold",
                 )}
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Today</span>
+                <span>Decide</span>
               </Link>
               <Link
                 href="/app/plan"

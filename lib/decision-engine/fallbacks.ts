@@ -15,6 +15,7 @@ export function generateFallbackMeal(
         mealType: criteria.mealType || 'any',
         isQuick: true,
         image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=1200&auto=format&fit=crop',
+        source: 'default',
         plate: [
           { role: 'STAPLE', name: 'Steamed Rice' },
           { role: 'PROTEIN', name: 'Pan-Fried Eggs' },
@@ -116,6 +117,7 @@ export function generateFallbackMeal(
       mealType: criteria.mealType || 'any',
       isQuick: true,
       image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1200&auto=format&fit=crop',
+      source: 'default',
       plate,
     },
     reason: 'We worked with what you have.',

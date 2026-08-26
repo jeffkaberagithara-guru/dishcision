@@ -43,7 +43,7 @@ export const TheatricalReveal: React.FC<TheatricalRevealProps> = ({
   const Icon = currentStep.icon;
 
   return (
-    <div className="w-full min-h-[380px] bg-white border border-[#DCD5C9] rounded-[2px] p-8 md:p-16 flex flex-col items-center justify-center space-y-8 shadow-xs">
+    <div className="w-full min-h-[280px] sm:min-h-[380px] bg-white border border-[#DCD5C9] rounded-[2px] p-6 sm:p-8 md:p-16 flex flex-col items-center justify-center space-y-6 sm:space-y-8 shadow-xs">
       <div className="relative w-16 h-16 flex items-center justify-center">
         {/* Subtle pulsating ring */}
         <motion.div

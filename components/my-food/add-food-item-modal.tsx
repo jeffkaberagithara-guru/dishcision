@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 interface AddFoodItemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (item: Omit<FoodItem, 'id'>) => void;
+  onAdd: (item: Omit<FoodItem, 'id' | 'source'>) => void;
 }
 
 const CATEGORIES: { label: string; value: FoodCategory }[] = [

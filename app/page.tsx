@@ -1,411 +1,479 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { BottomNav } from '@/components/layout/bottom-nav';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, RefreshCw, Calendar, ShoppingBag } from 'lucide-react';
+import { MealResultCard } from '@/components/today/meal-result-card';
+import { TheatricalReveal } from '@/components/today/theatrical-reveal';
+import { useFoodStore } from '@/lib/store/use-food-store';
+import { MealType } from '@/lib/types';
+import {
+  Coffee,
+  Sun,
+  Moon,
+  CalendarDays,
+  Sparkles,
+  Check,
+  X,
+  Search,
+  Utensils,
+  ChevronDown,
+  ChevronUp,
+  Package,
+  Beef,
+  Leaf,
+  Bean,
+  Salad,
+  Apple,
+  ShoppingCart,
+} from 'lucide-react';
 
-const DEMO_MEALS = [
-  {
-    name: 'MUKIMO + BEEF + CABBAGE',
-    plate: [
-      { role: 'STAPLE', name: 'Ndengu Mukimo' },
-      { role: 'PROTEIN', name: 'Beef Stew' },
-      { role: 'VEGETABLE', name: 'Fried Cabbage' },
-    ],
-    image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=1200&auto=format&fit=crop',
-  },
-  {
-    name: 'UGALI + NYAMA CHOMA + KACHUMBARI',
-    plate: [
-      { role: 'STAPLE', name: 'Ugali' },
-      { role: 'PROTEIN', name: 'Nyama Choma' },
-      { role: 'SALAD', name: 'Kachumbari' },
-    ],
-    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1200&auto=format&fit=crop',
-  },
-  {
-    name: 'RICE + BEANS + SUKUMA WIKI',
-    plate: [
-      { role: 'STAPLE', name: 'Rice' },
-      { role: 'LEGUME', name: 'Beans Curry' },
-      { role: 'VEGETABLE', name: 'Sukuma Wiki' },
-    ],
-    image: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=1200&auto=format&fit=crop',
-  },
-  {
-    name: 'PEAS GITHERI + AVOCADO + CABBAGE',
-    plate: [
-      { role: 'STAPLE', name: 'Peas Githeri' },
-      { role: 'FRUIT', name: 'Avocado' },
-      { role: 'VEGETABLE', name: 'Steamed Cabbage' },
-    ],
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1200&auto=format&fit=crop',
-  },
-];
+type Step = 'type' | 'foods' | 'result' | 'fullday';
 
-export default function LandingPage() {
-  const [demoIndex, setDemoIndex] = useState(0);
-  const [isSpinning, setIsSpinning] = useState(false);
+const CATEGORY_CONFIG: Record<string, { label: string; icon: React.ComponentType<{ className?: string }> }> = {
+  staple: { label: 'STAPLES', icon: Package },
+  protein: { label: 'PROTEINS', icon: Beef },
+  vegetable: { label: 'VEGETABLES', icon: Leaf },
+  legume: { label: 'LEGUMES', icon: Bean },
+  salad: { label: 'SALADS', icon: Salad },
+  fruit: { label: 'FRUIT', icon: Apple },
+  beverage: { label: 'BEVERAGES', icon: Coffee },
+  pantry: { label: 'PANTRY', icon: ShoppingCart },
+};
 
-  const handleNextDemo = () => {
-    setIsSpinning(true);
-    setTimeout(() => {
-      setDemoIndex((prev) => (prev + 1) % DEMO_MEALS.length);
-      setIsSpinning(false);
-    }, 600);
+const CATEGORY_ORDER = ['staple', 'protein', 'legume', 'vegetable', 'salad', 'fruit', 'beverage', 'pantry'];
+
+export default function HomePage() {
+  const {
+    foodItems,
+    meals,
+    currentDecision,
+    makeNewDecision,
+    acceptCurrentDecision,
+    rejectCurrentDecisionNotToday,
+    rejectCurrentDecisionNotAvailable,
+    settings,
+    updateSettings,
+    dailyPlan,
+    generatePlan,
+    regenerateSlot,
+    isLoaded,
+  } = useFoodStore();
+
+  const [step, setStep] = useState<Step>('type');
+  const [selectedMealType, setSelectedMealType] = useState<MealType>('dinner');
+  const [selectedFoodIds, setSelectedFoodIds] = useState<Set<string>>(new Set());
+  const [isRevealing, setIsRevealing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(CATEGORY_ORDER));
+  const [showAcceptedToast, setShowAcceptedToast] = useState(false);
+
+  const filteredFoodItems = useMemo(() => {
+    if (!searchQuery.trim()) return foodItems;
+    const q = searchQuery.toLowerCase();
+    return foodItems.filter((f) => f.name.toLowerCase().includes(q));
+  }, [foodItems, searchQuery]);
+
+  const groupedFoods = useMemo(() => {
+    const groups: Record<string, typeof foodItems> = {};
+    CATEGORY_ORDER.forEach((cat) => { groups[cat] = []; });
+    filteredFoodItems.forEach((item) => {
+      if (groups[item.category]) groups[item.category].push(item);
+    });
+    return groups;
+  }, [filteredFoodItems]);
+
+  const toggleFood = (id: string) => {
+    setSelectedFoodIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
-  const activeDemo = DEMO_MEALS[demoIndex];
+  const toggleAllVisible = () => {
+    const visibleIds = filteredFoodItems.map((f) => f.id);
+    const allSelected = visibleIds.every((id) => selectedFoodIds.has(id));
+    if (allSelected) {
+      setSelectedFoodIds((prev) => {
+        const next = new Set(prev);
+        visibleIds.forEach((id) => next.delete(id));
+        return next;
+      });
+    } else {
+      setSelectedFoodIds((prev) => {
+        const next = new Set(prev);
+        visibleIds.forEach((id) => next.add(id));
+        return next;
+      });
+    }
+  };
+
+  const clearSelection = () => setSelectedFoodIds(new Set());
+
+  const toggleCategory = (cat: string) => {
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat);
+      else next.add(cat);
+      return next;
+    });
+  };
+
+  const handleGenerate = () => {
+    setIsRevealing(true);
+    setStep('result');
+    const customIds = selectedFoodIds.size > 0 ? Array.from(selectedFoodIds) : undefined;
+    makeNewDecision({ mealType: selectedMealType, customAvailableFoodIds: customIds });
+  };
+
+  const handleRevealComplete = () => {
+    setIsRevealing(false);
+    setStep('result');
+  };
+
+  const handleCookThis = (hadLeftovers: boolean) => {
+    acceptCurrentDecision(hadLeftovers);
+    setShowAcceptedToast(true);
+    setTimeout(() => setShowAcceptedToast(false), 4000);
+  };
+
+  const handleNotToday = () => {
+    setIsRevealing(true);
+    rejectCurrentDecisionNotToday();
+  };
+
+  const handleNotAvailable = () => {
+    setIsRevealing(true);
+    rejectCurrentDecisionNotAvailable();
+  };
+
+  const handleToggleKeepItEasy = () => {
+    const next = !settings.keepItEasyDefault;
+    updateSettings({ keepItEasyDefault: next });
+    const customIds = selectedFoodIds.size > 0 ? Array.from(selectedFoodIds) : undefined;
+    makeNewDecision({ mealType: selectedMealType, customAvailableFoodIds: customIds, keepItEasy: next });
+  };
+
+  const handleGenerateDay = () => {
+    generatePlan();
+    setStep('fullday');
+  };
+
+  const inStockCount = foodItems.filter((f) => f.inStock).length;
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-[#F7F3EC] flex flex-col justify-between">
+        <Header />
+        <main className="container-editorial py-24 text-center">
+          <p className="font-serif italic text-xl text-[#6E6A61]">Loading your pantry...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#F7F3EC] flex flex-col justify-between selection:bg-[#8A9B84] selection:text-white">
-      <Header isPublic />
+    <div className="min-h-screen bg-[#F7F3EC] flex flex-col pb-20 md:pb-0">
+      <Header />
 
-      <main className="space-y-24 md:space-y-36 pb-24">
-        {/* 1. HERO SECTION */}
-        <section className="container-editorial pt-16 md:pt-28 space-y-12">
-          <div className="max-w-4xl space-y-8">
-            <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal tracking-tight text-[#171714] leading-[0.98]">
-              YOU HAVE FOOD. <br />
-              YOU JUST DON&apos;T KNOW <br />
-              <span className="italic font-normal">WHAT TO COOK.</span>
-            </h1>
+      <main className="container-editorial py-8 sm:py-12 md:py-20 max-w-4xl w-full flex-1 space-y-8">
+        {/* Step 1: What do you want to eat? */}
+        {step === 'type' && (
+          <>
+            <div className="space-y-2">
+              <span className="text-[10px] uppercase tracking-[0.3em] font-sans font-semibold text-[#8A9B84] block">
+                DISHCISION
+              </span>
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-[#171714] font-normal leading-tight">
+                What do you want to eat?
+              </h1>
+              <p className="font-serif italic text-lg sm:text-xl text-[#6E6A61]">
+                Choose a meal time, then tell us what you have.
+              </p>
+            </div>
 
-            <p className="font-serif italic text-xl sm:text-2xl text-[#6E6A61] max-w-xl">
-              Let DISHCISION decide.
-            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {([
+                { type: 'breakfast' as MealType, label: 'Breakfast', icon: Coffee, desc: 'Morning meal' },
+                { type: 'lunch' as MealType, label: 'Lunch', icon: Sun, desc: 'Midday meal' },
+                { type: 'dinner' as MealType, label: 'Dinner', icon: Moon, desc: 'Evening meal' },
+                { type: 'any' as MealType, label: 'Full Day', icon: CalendarDays, desc: 'Plan all three' },
+              ]).map(({ type, label, icon: Icon, desc }) => (
+                <button
+                  key={type}
+                  onClick={() => {
+                    setSelectedMealType(type);
+                    if (type === 'any') {
+                      handleGenerateDay();
+                    } else {
+                      setStep('foods');
+                    }
+                  }}
+                  className="p-6 bg-white border border-[#DCD5C9] rounded-[2px] text-left space-y-3 hover:border-[#8A9B84] transition-colors cursor-pointer group"
+                >
+                  <Icon className="w-5 h-5 text-[#8A9B84] group-hover:text-[#54684E] transition-colors" />
+                  <div>
+                    <span className="font-serif text-lg text-[#171714] font-medium block">{label}</span>
+                    <span className="text-xs text-[#6E6A61] font-sans">{desc}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
 
-            <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-              <Link href="/app/today">
-                <Button variant="primary" size="hero" className="w-full sm:w-auto gap-3">
+            {/* Quick stats */}
+            <div className="flex items-center gap-4 text-xs font-sans text-[#6E6A61]">
+              <span>{foodItems.length} foods in library</span>
+              <span className="text-[#DCD5C9]">·</span>
+              <span>{inStockCount} available now</span>
+              <span className="text-[#DCD5C9]">·</span>
+              <span>{meals.length} meals</span>
+            </div>
+          </>
+        )}
+
+        {/* Step 2: What do you have available? */}
+        {step === 'foods' && (
+          <>
+            <div className="space-y-2">
+              <button onClick={() => setStep('type')} className="text-xs font-sans text-[#8A9B84] hover:underline cursor-pointer">
+                ← Back to meal type
+              </button>
+              <h2 className="font-serif text-3xl sm:text-4xl text-[#171714] font-normal">
+                What do you have?
+              </h2>
+              <p className="text-sm text-[#6E6A61] font-sans">
+                Select the foods you have available, or skip to use all in-stock items.
+              </p>
+            </div>
+
+            {/* Search + Controls */}
+            <div className="space-y-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6E6A61]" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search foods..."
+                  className="w-full pl-10 pr-4 min-h-11 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6E6A61] hover:text-[#171714] cursor-pointer">
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <button onClick={toggleAllVisible} className="text-xs font-sans text-[#8A9B84] hover:underline cursor-pointer">
+                    Select All
+                  </button>
+                  {selectedFoodIds.size > 0 && (
+                    <>
+                      <span className="text-[#DCD5C9]">·</span>
+                      <button onClick={clearSelection} className="text-xs font-sans text-[#6E6A61] hover:underline cursor-pointer">
+                        Clear ({selectedFoodIds.size} selected)
+                      </button>
+                    </>
+                  )}
+                </div>
+                <span className="text-xs text-[#6E6A61] font-sans">
+                  {selectedFoodIds.size > 0 ? `${selectedFoodIds.size} selected` : 'Using all in-stock'}
+                </span>
+              </div>
+            </div>
+
+            {/* Food grid */}
+            <div className="space-y-3">
+              {CATEGORY_ORDER.map((cat) => {
+                const items = groupedFoods[cat];
+                if (items.length === 0) return null;
+                const config = CATEGORY_CONFIG[cat];
+                const Icon = config?.icon || Package;
+                const isExpanded = expandedCategories.has(cat);
+
+                return (
+                  <div key={cat} className="bg-white border border-[#DCD5C9] rounded-[2px] overflow-hidden">
+                    <button
+                      onClick={() => toggleCategory(cat)}
+                      className="w-full px-4 py-2.5 flex items-center justify-between hover:bg-[#F7F3EC]/50 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Icon className="w-4 h-4 text-[#6E6A61]" />
+                        <span className="text-xs uppercase tracking-[0.15em] font-sans font-semibold text-[#171714]">
+                          {config?.label || cat}
+                        </span>
+                        <Badge variant="muted" size="sm">{items.length}</Badge>
+                      </div>
+                      {isExpanded ? <ChevronUp className="w-4 h-4 text-[#6E6A61]" /> : <ChevronDown className="w-4 h-4 text-[#6E6A61]" />}
+                    </button>
+
+                    {isExpanded && (
+                      <div className="border-t border-[#DCD5C9] p-3 flex flex-wrap gap-2">
+                        {items.map((item) => {
+                          const isSelected = selectedFoodIds.has(item.id);
+                          return (
+                            <button
+                              key={item.id}
+                              onClick={() => toggleFood(item.id)}
+                              className={`px-3 py-1.5 text-xs font-sans rounded-[2px] border transition-colors cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#8A9B84] border-[#8A9B84] text-white'
+                                  : item.inStock
+                                    ? 'bg-white border-[#DCD5C9] text-[#171714] hover:border-[#8A9B84]'
+                                    : 'bg-[#F7F3EC] border-[#DCD5C9] text-[#6E6A61] line-through'
+                              }`}
+                            >
+                              {item.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Generate button */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              <Button variant="primary" size="lg" onClick={handleGenerate} className="gap-2 flex-1">
+                <Sparkles className="w-4 h-4 text-[#8A9B84]" />
+                <span className="hidden sm:inline">MAKE MY DISHCISION</span>
+                <span className="sm:hidden">DECIDE FOR ME</span>
+              </Button>
+              <Button variant="outline" size="lg" onClick={handleGenerateDay} className="gap-2">
+                <CalendarDays className="w-4 h-4" />
+                <span className="hidden sm:inline">FULL DAY</span>
+                <span className="sm:hidden">PLAN ALL DAY</span>
+              </Button>
+            </div>
+          </>
+        )}
+
+        {/* Step 3: Result */}
+        {(step === 'result' || (step === 'foods' && isRevealing)) && (
+          <>
+            {isRevealing ? (
+              <TheatricalReveal onComplete={handleRevealComplete} durationMs={1100} />
+            ) : currentDecision ? (
+              <>
+                <button onClick={() => setStep('foods')} className="text-xs font-sans text-[#8A9B84] hover:underline cursor-pointer">
+                  ← Back to food selection
+                </button>
+                {showAcceptedToast && (
+                  <div className="p-4 bg-[#8A9B84]/15 border border-[#8A9B84]/40 rounded-[2px] flex items-center gap-3">
+                    <Check className="w-5 h-5 text-[#54684E] shrink-0" />
+                    <span className="text-xs font-sans font-medium text-[#171714]">
+                      Meal logged! Head to the Plan page to build your full day.
+                    </span>
+                  </div>
+                )}
+                <MealResultCard
+                  decision={currentDecision}
+                  onCookThis={handleCookThis}
+                  onDishcisionAgain={handleGenerate}
+                  onNotToday={handleNotToday}
+                  onNotAvailable={handleNotAvailable}
+                  onToggleKeepItEasy={handleToggleKeepItEasy}
+                  isKeepItEasyActive={settings.keepItEasyDefault}
+                />
+              </>
+            ) : (
+              <div className="p-12 bg-white border border-[#DCD5C9] rounded-[2px] text-center space-y-4">
+                <h2 className="font-serif text-2xl text-[#171714]">Ready to decide?</h2>
+                <Button variant="primary" size="hero" onClick={handleGenerate} className="gap-2">
                   <Sparkles className="w-4 h-4 text-[#8A9B84]" />
                   MAKE MY DISHCISION
                 </Button>
-              </Link>
-              <Link href="/how-it-works">
-                <Button variant="outline" size="hero" className="w-full sm:w-auto">
-                  HOW IT WORKS
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          {/* 4-Image Editorial Food Grid (Real Staples) */}
-          <div className="pt-12 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <div className="space-y-2 group">
-              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[2px] bg-[#EDE7DE] border border-[#DCD5C9]">
-                <Image
-                  src="https://images.unsplash.com/photo-1541832676-9b763b0239ab?q=80&w=800&auto=format&fit=crop"
-                  alt="Ugali and stew"
-                  fill
-                  priority
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                />
               </div>
-              <span className="text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#171714] block">
-                UGALI
-              </span>
-            </div>
+            )}
+          </>
+        )}
 
-            <div className="space-y-2 group">
-              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[2px] bg-[#EDE7DE] border border-[#DCD5C9]">
-                <Image
-                  src="https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=800&auto=format&fit=crop"
-                  alt="Rice and beans"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-              <span className="text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#171714] block">
-                RICE
-              </span>
-            </div>
-
-            <div className="space-y-2 group">
-              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[2px] bg-[#EDE7DE] border border-[#DCD5C9]">
-                <Image
-                  src="https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=800&auto=format&fit=crop"
-                  alt="Mukimo"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-              <span className="text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#171714] block">
-                MUKIMO
-              </span>
-            </div>
-
-            <div className="space-y-2 group">
-              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[2px] bg-[#EDE7DE] border border-[#DCD5C9]">
-                <Image
-                  src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop"
-                  alt="Githeri"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-              <span className="text-[11px] uppercase tracking-[0.2em] font-sans font-semibold text-[#171714] block">
-                GITHERI
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* 2. THE THREE-STEP VALUE PROPOSITION */}
-        <section className="container-editorial border-t border-[#DCD5C9] pt-20 space-y-16">
-          <div className="max-w-2xl space-y-4">
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal text-[#171714] leading-tight">
-              YOU BRING THE FOOD. <br />
-              WE MAKE THE DECISION.
-            </h2>
-            <p className="text-sm md:text-base text-[#6E6A61] font-sans leading-relaxed">
-              DISHCISION never introduces unfamiliar ingredients or unapproachable international recipes. The user owns their food universe.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-            <div className="space-y-4 border-l border-[#DCD5C9] pl-6">
-              <span className="font-serif text-2xl md:text-3xl text-[#8A9B84] font-medium">01</span>
-              <h3 className="text-xs uppercase tracking-[0.25em] font-sans font-semibold text-[#171714]">
-                ADD YOUR FOOD
-              </h3>
-              <p className="text-xs md:text-sm text-[#6E6A61] leading-relaxed">
-                Enter the home meals and staples you already know how to cook. Your pantry catalogue is the only menu DISHCISION pulls from.
-              </p>
-            </div>
-
-            <div className="space-y-4 border-l border-[#DCD5C9] pl-6">
-              <span className="font-serif text-2xl md:text-3xl text-[#8A9B84] font-medium">02</span>
-              <h3 className="text-xs uppercase tracking-[0.25em] font-sans font-semibold text-[#171714]">
-                TELL US WHAT&apos;S IN THE HOUSE
-              </h3>
-              <p className="text-xs md:text-sm text-[#6E6A61] leading-relaxed">
-                Filter by current pantry availability or let the algorithm choose from your staples while preventing recent dinner repetition.
-              </p>
-            </div>
-
-            <div className="space-y-4 border-l border-[#DCD5C9] pl-6">
-              <span className="font-serif text-2xl md:text-3xl text-[#8A9B84] font-medium">03</span>
-              <h3 className="text-xs uppercase tracking-[0.25em] font-sans font-semibold text-[#171714]">
-                GET YOUR DISHCISION
-              </h3>
-              <p className="text-xs md:text-sm text-[#6E6A61] leading-relaxed">
-                Receive an authoritative, balanced plate recommendation in under one second. Cook it, save it, or request another instant option.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* 3. INTERACTIVE HOME DEMONSTRATION */}
-        <section className="container-editorial border-t border-[#DCD5C9] pt-20 space-y-12">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        {/* Full Day Result */}
+        {step === 'fullday' && dailyPlan && (
+          <>
+            <button onClick={() => setStep('type')} className="text-xs font-sans text-[#8A9B84] hover:underline cursor-pointer">
+              ← Back to meal type
+            </button>
             <div className="space-y-2">
-              <span className="text-xs uppercase tracking-[0.3em] font-sans font-semibold text-[#8A9B84]">
-                LIVE INTERACTION
+              <span className="text-[10px] uppercase tracking-[0.3em] font-sans font-semibold text-[#8A9B84] block">
+                TODAY&apos;S MEAL PLAN
               </span>
-              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#171714]">
-                TODAY&apos;S DISHCISION
+              <h2 className="font-serif text-3xl sm:text-4xl text-[#171714] font-normal">
+                Your Full Day
               </h2>
             </div>
 
-            <Button
-              variant="outline"
-              size="md"
-              onClick={handleNextDemo}
-              isLoading={isSpinning}
-              className="gap-2 self-start sm:self-auto"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              DISHCISION AGAIN
-            </Button>
-          </div>
-
-          <div className="border border-[#DCD5C9] bg-white p-8 md:p-12 rounded-[2px] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-6 space-y-6">
-              <span className="text-[10px] uppercase tracking-[0.25em] text-[#6E6A61] font-sans block">
-                MAIN DINNER CANDIDATE
-              </span>
-
-              <h3 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#171714] font-normal leading-tight">
-                {activeDemo.name}
-              </h3>
-
-              <div className="space-y-3 pt-4 border-t border-[#DCD5C9]/60">
-                <span className="text-[10px] uppercase tracking-widest text-[#171714] font-semibold block">
-                  THE PLATE
-                </span>
-                <div className="grid grid-cols-3 gap-4">
-                  {activeDemo.plate.map((p, i) => (
-                    <div key={i} className="space-y-0.5">
-                      <span className="text-[9px] uppercase tracking-wider text-[#6E6A61] block">
-                        {p.role}
+            <div className="space-y-3">
+              {(['breakfast', 'lunch', 'dinner'] as const).map((slot) => {
+                const planSlot = dailyPlan[slot];
+                const meal = planSlot?.meal;
+                if (!meal) return null;
+                return (
+                  <div key={slot} className="bg-white border border-[#DCD5C9] rounded-[2px] p-4 sm:p-5 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase tracking-widest text-[#8A9B84] font-semibold font-sans">
+                        {slot}
                       </span>
-                      <span className="font-serif text-base text-[#171714] font-medium block">
-                        {p.name}
-                      </span>
+                      <button
+                        onClick={() => regenerateSlot(slot)}
+                        className="text-xs font-sans text-[#8A9B84] hover:underline cursor-pointer"
+                      >
+                        Regenerate
+                      </button>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-4 flex items-center gap-4">
-                <Link href="/app/today">
-                  <Button variant="primary" size="md">
-                    ENTER APP & COOK THIS
-                  </Button>
-                </Link>
-              </div>
+                    <h3 className="font-serif text-lg sm:text-xl text-[#171714] font-medium">
+                      {meal.name}
+                    </h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {meal.plate.map((p, i) => (
+                        <span key={i} className="text-[9px] uppercase tracking-wider px-2 py-0.5 bg-[#F7F3EC] border border-[#DCD5C9] text-[#171714] rounded-[2px] font-medium">
+                          {p.role}: {p.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
-            <div className="lg:col-span-6">
-              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2px] border border-[#DCD5C9] bg-[#EDE7DE]">
-                <Image
-                  src={activeDemo.image}
-                  alt={activeDemo.name}
-                  fill
-                  className="object-cover transition-all duration-700"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 4. WHOLE-DAY PLANNER SHOWCASE */}
-        <section className="container-editorial border-t border-[#DCD5C9] pt-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-5 space-y-6">
-            <h2 className="font-serif text-4xl sm:text-5xl text-[#171714] leading-tight">
-              ONE DAY. <br />
-              THREE DECISIONS.
-            </h2>
-            <p className="text-sm md:text-base text-[#6E6A61] font-sans leading-relaxed">
-              DISHCISION doesn&apos;t merely solve dinner. It connects Breakfast, Lunch, and Dinner into a seamless 24-hour cadence—intelligently turning yesterday&apos;s dinner into morning breakfast candidates to eliminate household food waste.
-            </p>
-            <Link href="/app/plan" className="inline-block pt-2">
-              <Button variant="secondary" size="lg" className="gap-2">
-                <Calendar className="w-4 h-4" />
-                EXPLORE WHOLE-DAY PLAN
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              <Button variant="primary" size="lg" onClick={() => { generatePlan(); }} className="gap-2 flex-1">
+                <Sparkles className="w-4 h-4 text-[#8A9B84]" />
+                <span className="hidden sm:inline">REGENERATE ENTIRE DAY</span>
+                <span className="sm:hidden">REGENERATE ALL</span>
               </Button>
-            </Link>
-          </div>
-
-          <div className="lg:col-span-7 space-y-4">
-            <div className="p-6 bg-white border border-[#DCD5C9] rounded-[2px] flex items-center justify-between">
-              <div>
-                <span className="text-[10px] uppercase tracking-widest text-[#8A9B84] font-semibold">
-                  01 · BREAKFAST
-                </span>
-                <h4 className="font-serif text-xl text-[#171714] font-medium">
-                  Leftover Rice + Beef + Kenyan Spiced Tea
-                </h4>
-              </div>
-              <Badge variant="terracotta">LEFTOVER</Badge>
+              <Link href="/app/plan" className="flex-1">
+                <Button variant="outline" size="lg" className="w-full gap-2">
+                  <Utensils className="w-4 h-4" />
+                  VIEW IN PLANNER
+                </Button>
+              </Link>
             </div>
+          </>
+        )}
 
-            <div className="p-6 bg-white border border-[#DCD5C9] rounded-[2px] flex items-center justify-between">
-              <div>
-                <span className="text-[10px] uppercase tracking-widest text-[#8A9B84] font-semibold">
-                  02 · LUNCH
-                </span>
-                <h4 className="font-serif text-xl text-[#171714] font-medium">
-                  Peas Githeri + Sliced Avocado + Cabbage
-                </h4>
-              </div>
-              <Badge variant="sage">BALANCED</Badge>
-            </div>
-
-            <div className="p-6 bg-white border border-[#DCD5C9] rounded-[2px] flex items-center justify-between">
-              <div>
-                <span className="text-[10px] uppercase tracking-widest text-[#8A9B84] font-semibold">
-                  03 · DINNER
-                </span>
-                <h4 className="font-serif text-xl text-[#171714] font-medium">
-                  Ugali + Pork + Sukuma Wiki + Kachumbari
-                </h4>
-              </div>
-              <Badge variant="sage">MAIN DISHCISION</Badge>
-            </div>
-          </div>
-        </section>
-
-        {/* 5. SHOPPING SHOWCASE */}
-        <section className="container-editorial border-t border-[#DCD5C9] pt-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-7 p-8 bg-white border border-[#DCD5C9] rounded-[2px] space-y-4">
-            <h3 className="text-xs uppercase tracking-[0.25em] font-sans font-semibold text-[#171714] border-b border-[#DCD5C9]/60 pb-3">
-              NEXT MONTH&apos;S SHOPPING (AGGREGATED GOODS ONLY)
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-xs">
-              <div className="space-y-1.5">
-                <span className="text-[10px] uppercase tracking-wider text-[#6E6A61] font-semibold">
-                  STAPLES
-                </span>
-                <p className="text-[#171714]">Maize flour, Rice, Potatoes, Bread</p>
-              </div>
-              <div className="space-y-1.5">
-                <span className="text-[10px] uppercase tracking-wider text-[#6E6A61] font-semibold">
-                  PROTEINS
-                </span>
-                <p className="text-[#171714]">Beef, Eggs, Pork, Sausages</p>
-              </div>
-              <div className="space-y-1.5">
-                <span className="text-[10px] uppercase tracking-wider text-[#6E6A61] font-semibold">
-                  VEGETABLES
-                </span>
-                <p className="text-[#171714]">Sukuma wiki, Cabbage, Spinach, Onions</p>
-              </div>
-              <div className="space-y-1.5">
-                <span className="text-[10px] uppercase tracking-wider text-[#6E6A61] font-semibold">
-                  LEGUMES
-                </span>
-                <p className="text-[#171714]">Ndengu, Yellow Beans, Peas</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-5 space-y-6">
-            <h2 className="font-serif text-4xl sm:text-5xl text-[#171714] leading-tight">
-              LESS THINKING. <br />
-              LESS WASTE. <br />
-              BETTER SHOPPING.
-            </h2>
-            <p className="text-sm md:text-base text-[#6E6A61] font-sans leading-relaxed">
-              Your planned meals automatically turn into your monthly shopping list. No fake gram calculations—just genuine pantry items you actually need.
-            </p>
-            <Link href="/app/shopping" className="inline-block pt-2">
-              <Button variant="secondary" size="lg" className="gap-2">
-                <ShoppingBag className="w-4 h-4" />
-                VIEW SHOPPING LIST
-              </Button>
-            </Link>
-          </div>
-        </section>
-
-        {/* 6. FINAL EDITORIAL CTA */}
-        <section className="container-editorial border-t border-[#DCD5C9] pt-24 pb-12 text-center max-w-3xl mx-auto space-y-8">
-          <h2 className="font-serif text-5xl sm:text-6xl md:text-7xl text-[#171714] font-normal leading-[0.98]">
-            WHAT ARE WE <br />
-            <span className="italic font-normal">EATING TOMORROW?</span>
-          </h2>
-
-          <p className="font-serif italic text-lg sm:text-xl text-[#6E6A61]">
-            DISH·CISION ends daily cooking paralysis.
-          </p>
-
-          <div className="pt-4">
-            <Link href="/app/today">
-              <Button variant="primary" size="hero">
-                START DECIDING LESS
-              </Button>
-            </Link>
-          </div>
-        </section>
+        {/* Navigation links */}
+        <div className="border-t border-[#DCD5C9] pt-6 flex flex-wrap gap-4 text-xs font-sans">
+          <Link href="/app/my-food" className="text-[#8A9B84] hover:underline">My Foods</Link>
+          <Link href="/app/plan" className="text-[#8A9B84] hover:underline">Plan</Link>
+          <Link href="/app/shopping" className="text-[#8A9B84] hover:underline">Shopping</Link>
+          <Link href="/how-it-works" className="text-[#6E6A61] hover:underline">How It Works</Link>
+        </div>
       </main>
 
       <Footer />
+      <BottomNav />
     </div>
   );
 }

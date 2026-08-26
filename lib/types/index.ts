@@ -20,6 +20,8 @@ export type FoodCategory =
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'any';
 
+export type DataSource = 'default' | 'personal';
+
 export interface PlateComponent {
   role: PlateRole;
   name: string;
@@ -35,7 +37,8 @@ export interface FoodItem {
   isStaple?: boolean;
   tags?: string[];
   unit?: string;
-  parentId?: string; // Links to a parent food group (e.g. fp-ugali) for variant display
+  parentId?: string;
+  source: DataSource;
 }
 
 export interface Meal {
@@ -45,12 +48,13 @@ export interface Meal {
   plate: PlateComponent[];
   mealType?: MealType;
   tags?: string[];
-  isQuick?: boolean; // Keep it easy / quick meal
+  isQuick?: boolean;
   isFavorite?: boolean;
-  isExcluded?: boolean; // "Never" blacklist
+  isExcluded?: boolean;
   image?: string;
-  lastCooked?: string; // ISO date string
+  lastCooked?: string;
   cookingTimeMinutes?: number;
+  source: DataSource;
 }
 
 export interface DailyPlanSlot {

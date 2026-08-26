@@ -32,13 +32,13 @@ interface FoodStoreContextType {
   settings: UserSettings;
 
   // Food Item Actions
-  addItem: (item: Omit<FoodItem, 'id'>) => void;
+  addItem: (item: Omit<FoodItem, 'id' | 'source'>) => void;
   updateItem: (id: string, updates: Partial<FoodItem>) => void;
   toggleInStock: (id: string) => void;
   deleteItem: (id: string) => void;
 
   // Meal Actions
-  addMeal: (meal: Omit<Meal, 'id'>) => void;
+  addMeal: (meal: Omit<Meal, 'id' | 'source'>) => void;
   updateMeal: (id: string, updates: Partial<Meal>) => void;
   deleteMeal: (id: string) => void;
   toggleMealFavorite: (id: string) => void;
@@ -201,10 +201,11 @@ export const FoodStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [settings, isLoaded]);
 
   // Food Item CRUD
-  const addItem = useCallback((item: Omit<FoodItem, 'id'>) => {
+  const addItem = useCallback((item: Omit<FoodItem, 'id' | 'source'>) => {
     const newItem: FoodItem = {
       ...item,
-      id: `f-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      id: `f-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      source: 'personal',
     };
     setFoodItems((prev) => [newItem, ...prev]);
   }, []);
@@ -226,10 +227,11 @@ export const FoodStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   // Meal CRUD
-  const addMeal = useCallback((meal: Omit<Meal, 'id'>) => {
+  const addMeal = useCallback((meal: Omit<Meal, 'id' | 'source'>) => {
     const newMeal: Meal = {
       ...meal,
-      id: `m-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      id: `m-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      source: 'personal',
     };
     setMeals((prev) => [newMeal, ...prev]);
   }, []);
@@ -448,7 +450,7 @@ export const FoodStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setCurrentDecision(initialDecision);
 
     try {
-      localStorage.clear();
+      Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
     } catch (e) {
       console.warn('Storage clear error', e);
     }
