@@ -111,15 +111,15 @@ export const STARTER_MEALS: Meal[] = [
   },
   {
     id: 'm-5',
-    name: 'Ugali + Nyama Choma + Fresh Kachumbari',
-    description: 'Fire-roasted meat paired with piping hot ugali and sharp tomato-chili salsa.',
+    name: 'Githeri + Nyama Choma + Fresh Kachumbari',
+    description: 'Fire-roasted meat paired with hearty githeri and sharp tomato-chili salsa.',
     mealType: 'dinner',
     isQuick: false,
     cookingTimeMinutes: 45,
     tags: ['weekend', 'celebratory', 'smoky'],
     source: 'default',
     plate: [
-      { role: 'STAPLE', name: 'Ugali', foodItemId: 'f-1' },
+      { role: 'STAPLE', name: 'Githeri Maize', foodItemId: 'f-8' },
       { role: 'PROTEIN', name: 'Nyama Choma', foodItemId: 'f-12' },
       { role: 'SALAD', name: 'Kachumbari', foodItemId: 'f-26' },
     ],
