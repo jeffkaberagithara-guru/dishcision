@@ -21,7 +21,7 @@ export const BottomNav: React.FC = () => {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#F7F3EC] border-t border-[#DCD5C9] px-4 py-2 flex justify-around items-center">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#F7F3EC]/95 backdrop-blur-md border-t border-[#DCD5C9] px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 flex justify-around items-center">
       {links.map(({ href, label, icon: Icon }) => {
         const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
         return (
@@ -30,18 +30,18 @@ export const BottomNav: React.FC = () => {
             href={href}
             onClick={scrollToTop}
             className={cn(
-              "flex flex-col items-center gap-1 text-[10px] uppercase tracking-wider font-sans py-1 px-3 rounded",
+              "flex flex-col items-center gap-1 text-[10px] uppercase tracking-wider font-sans py-2 px-4 rounded-xl min-w-[4.5rem]",
               isActive
-                ? "text-[#171714] font-semibold"
+                ? "text-[#171714] bg-[#171714]/5 font-semibold"
                 : "text-[#6E6A61] hover:text-[#171714]",
             )}
           >
-            <Icon className="w-5 h-5" />
+            <Icon className="w-6 h-6" />
             <span>{label}</span>
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 };
 
