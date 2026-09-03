@@ -7,10 +7,11 @@ export default function AboutPage() {
     <div className="min-h-screen bg-[#F7F3EC] flex flex-col justify-between">
       <Header isPublic />
       <main className="container-editorial py-16 md:py-24 max-w-3xl">
-        <h1 className="font-serif text-4xl md:text-6xl text-[#171714] mb-8 font-normal">
-          About DISHCISION
+        <span className="text-xs uppercase tracking-[0.25em] font-semibold text-[#8A9B84] block mb-4">About</span>
+        <h1 className="font-hero text-4xl md:text-6xl text-[#171714] mb-8">
+          About <span className="italic text-[#8A9B84]">DISHCISION</span>
         </h1>
-        <div className="space-y-6 text-sm md:text-base text-[#6E6A61] leading-relaxed">
+        <div className="space-y-6 text-base md:text-lg text-[#6E6A61] leading-relaxed">
           <p>
             DISHCISION is a personal food decision engine built to eliminate
             kitchen decision fatigue. Instead of suggesting obscure recipes or

@@ -34,21 +34,19 @@ export default function ContactPage() {
       <Header isPublic />
       <main className="container-editorial py-16 md:py-24 max-w-2xl space-y-8">
         <div className="space-y-4">
-          <span className="text-[10px] uppercase tracking-[0.3em] font-sans font-semibold text-[#8A9B84]">
-            GET IN TOUCH
-          </span>
-          <h1 className="font-serif text-4xl md:text-6xl text-[#171714] font-normal">
-            Contact Us
-          </h1>
-          <p className="font-serif italic text-lg text-[#6E6A61]">
+          <span className="text-xs uppercase tracking-[0.25em] font-sans font-semibold text-[#8A9B84]">Get in touch</span>
+          <h1 className="font-hero text-4xl md:text-6xl text-[#171714]">Contact Us</h1>
+          <p className="font-serif italic text-xl text-[#6E6A61]">
             Have feedback, questions, or partnership ideas? We&apos;d love to hear from you.
           </p>
         </div>
 
         {submitted ? (
-          <div className="p-8 bg-white border border-[#8A9B84]/40 rounded-[2px] text-center space-y-4">
-            <CheckCircle2 className="w-10 h-10 text-[#8A9B84] mx-auto" />
-            <h2 className="font-serif text-2xl text-[#171714]">Message Sent</h2>
+          <div className="card-modern p-10 text-center space-y-4">
+            <div className="grid place-items-center size-16 rounded-2xl bg-[#8A9B84]/12 text-[#54684E] mx-auto">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <h2 className="font-hero text-2xl text-[#171714]">Message Sent</h2>
             <p className="text-sm text-[#6E6A61] max-w-sm mx-auto">
               Thank you for reaching out. We&apos;ll get back to you at <span className="font-medium text-[#171714]">{email}</span> as soon as possible.
             </p>
@@ -59,54 +57,47 @@ export default function ContactPage() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <label htmlFor="contact-name" className="block text-xs uppercase tracking-wider text-[#6E6A61] font-sans font-medium">
-                Name
-              </label>
+              <label htmlFor="contact-name" className="block text-sm font-medium text-[#171714]">Name</label>
               <input
                 id="contact-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
-                className={`w-full min-h-11 px-3 border bg-white text-sm text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84] ${errors.name ? 'border-[#B76546]' : 'border-[#DCD5C9]'}`}
+                className={`w-full min-h-12 px-4 border bg-white text-base rounded-xl focus:outline-none focus:border-[#8A9B84] focus:ring-4 focus:ring-[#8A9B84]/10 ${errors.name ? 'border-[#B76546]' : 'border-[#DCD5C9]'}`}
               />
               {errors.name && <p className="text-xs text-[#B76546]">{errors.name}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="contact-email" className="block text-xs uppercase tracking-wider text-[#6E6A61] font-sans font-medium">
-                Email
-              </label>
+              <label htmlFor="contact-email" className="block text-sm font-medium text-[#171714]">Email</label>
               <input
                 id="contact-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className={`w-full min-h-11 px-3 border bg-white text-sm text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84] ${errors.email ? 'border-[#B76546]' : 'border-[#DCD5C9]'}`}
+                className={`w-full min-h-12 px-4 border bg-white text-base rounded-xl focus:outline-none focus:border-[#8A9B84] focus:ring-4 focus:ring-[#8A9B84]/10 ${errors.email ? 'border-[#B76546]' : 'border-[#DCD5C9]'}`}
               />
               {errors.email && <p className="text-xs text-[#B76546]">{errors.email}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="contact-message" className="block text-xs uppercase tracking-wider text-[#6E6A61] font-sans font-medium">
-                Message
-              </label>
+              <label htmlFor="contact-message" className="block text-sm font-medium text-[#171714]">Message</label>
               <textarea
                 id="contact-message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Tell us what's on your mind..."
                 rows={5}
-                className={`w-full min-h-[120px] px-3 py-2 border bg-white text-sm text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84] resize-none ${errors.message ? 'border-[#B76546]' : 'border-[#DCD5C9]'}`}
+                className={`w-full min-h-[130px] px-4 py-3 border bg-white text-base rounded-xl focus:outline-none focus:border-[#8A9B84] focus:ring-4 focus:ring-[#8A9B84]/10 resize-none ${errors.message ? 'border-[#B76546]' : 'border-[#DCD5C9]'}`}
               />
               {errors.message && <p className="text-xs text-[#B76546]">{errors.message}</p>}
             </div>
 
             <div className="pt-2">
               <Button type="submit" variant="primary" size="lg" className="gap-2">
-                <Send className="w-4 h-4" />
-                SEND MESSAGE
+                <Send className="w-4 h-4" /> Send Message
               </Button>
             </div>
           </form>
