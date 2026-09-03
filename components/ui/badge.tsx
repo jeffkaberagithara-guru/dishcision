@@ -37,7 +37,7 @@ export const Badge: React.FC<BadgeProps> = ({
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center font-sans uppercase font-semibold tracking-widest rounded-[2px] transition-colors",
+        "inline-flex items-center justify-center font-sans uppercase font-semibold tracking-widest rounded-full transition-colors",
         variantStyles[variant] || variantStyles.default,
         sizeStyles[size] || sizeStyles.md,
         className,

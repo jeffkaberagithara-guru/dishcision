@@ -112,3 +112,26 @@
     padding-right: 4rem;
   }
 }
+
+/* Large, appetizing hero title */
+.font-hero {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+
+/* Soft gradient backdrop used behind the generator hero */
+.hero-veil {
+  background:
+    radial-gradient(60rem 30rem at 80% -10%, rgba(138, 155, 132, 0.18), transparent 60%),
+    radial-gradient(50rem 28rem at 10% 110%, rgba(183, 101, 70, 0.12), transparent 60%);
+}
+
+/* A gentle card surface with larger radius for the modern, friendly look */
+.card-modern {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 2px rgba(23, 23, 20, 0.04), 0 12px 32px -18px rgba(23, 23, 20, 0.18);
+}
