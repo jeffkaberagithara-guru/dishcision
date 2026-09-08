@@ -37,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({ isPublic = false }) => {
         </Link>
 
         {!isPublic && (
-          <nav className="hidden md:flex items-center gap-1 text-sm font-medium text-[#6E6A61]">
+          <nav className="hidden lg:flex items-center gap-1 text-sm font-medium text-[#6E6A61]">
             {NAV.map(({ href, label }) => {
               const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
               return (
