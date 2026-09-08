@@ -34,6 +34,13 @@ const ROLE_EMOJI: Record<string, string> = {
   OTHER: '🥄',
 };
 
+const MEAL_TYPE_LABELS: Record<string, string> = {
+  breakfast: 'Breakfast',
+  lunch: 'Lunch',
+  dinner: 'Dinner',
+  any: 'Any meal',
+};
+
 export const BigMealReveal: React.FC<BigMealRevealProps> = ({
   decision,
   onCookThis,
@@ -52,7 +59,7 @@ export const BigMealReveal: React.FC<BigMealRevealProps> = ({
       <div className="px-6 sm:px-10 pt-8 sm:pt-10 pb-6">
         <div className="flex flex-col items-center text-center gap-3">
           <span className="text-[11px] uppercase tracking-[0.25em] font-sans font-semibold text-[#8A9B84]">
-            A balanced meal for you
+            A balanced {meal.mealType && MEAL_TYPE_LABELS[meal.mealType] ? MEAL_TYPE_LABELS[meal.mealType].toLowerCase() : 'meal'} for you
           </span>
           <h2 className="font-hero text-3xl sm:text-4xl md:text-5xl text-[#171714]">
             {meal.name}
