@@ -85,7 +85,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F3EC] flex flex-col pb-24 md:pb-0">
+    <div className="min-h-screen bg-[#F7F3EC] flex flex-col pb-24 lg:pb-0">
       <Header />
 
       <main className="flex-1 w-full hero-veil">
@@ -102,7 +102,7 @@ export default function HomePage() {
                 className="w-full flex flex-col items-center gap-8 sm:gap-12"
               >
                 <div className="space-y-4">
-                  <h1 className="font-hero text-5xl sm:text-6xl md:text-7xl text-[#171714]">
+                  <h1 className="font-hero text-4xl sm:text-6xl md:text-7xl text-[#171714]">
                     What&apos;s cooking
                     <span className="italic text-[#8A9B84] block">today?</span>
                   </h1>
@@ -159,10 +159,13 @@ export default function HomePage() {
                   </span>
                 </motion.button>
 
-                <p className="text-base sm:text-lg text-[#6E6A61] font-sans flex items-center gap-2">
+                <p className="text-base sm:text-lg text-[#6E6A61] font-sans flex items-center flex-wrap justify-center gap-2">
                   <Zap className="w-5 h-5 text-[#8A9B84]" />
-                  {mealType === 'breakfast' ? 'Breakfast menu' : `${mealType === 'lunch' ? 'Lunch' : 'Dinner'} menu`}
-                  {' · '}Balanced{mealType === 'breakfast' ? ' · ' : ' · '}Never repeats
+                  <span>{mealType.charAt(0).toUpperCase() + mealType.slice(1)} menu</span>
+                  <span aria-hidden="true">·</span>
+                  <span>Balanced</span>
+                  <span aria-hidden="true">·</span>
+                  <span>Never repeats</span>
                 </p>
 
                 {/* Minimal secondary access */}
