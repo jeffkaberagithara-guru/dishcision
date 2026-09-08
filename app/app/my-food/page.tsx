@@ -78,7 +78,7 @@ export default function MyFoodPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F3EC] flex flex-col pb-24 md:pb-0">
+    <div className="min-h-screen bg-[#F7F3EC] flex flex-col pb-24 lg:pb-0">
       <Header />
       <main className="container-editorial w-full max-w-5xl flex-1 py-10 sm:py-14 md:py-20 space-y-6">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
@@ -271,12 +271,12 @@ function FoodSection({
           <div key={item.id} className="px-5 py-3.5 flex items-center justify-between gap-3 hover:bg-[#F7F3EC]/40 transition-colors">
             <button
               onClick={() => onToggleStock(item.id)}
-              className={`grid size-6 shrink-0 place-items-center rounded-lg border transition-colors cursor-pointer ${
+              className={`grid size-7 shrink-0 place-items-center rounded-lg border transition-colors cursor-pointer ${
                 item.inStock ? 'bg-[#8A9B84] border-[#8A9B84] text-white' : 'border-[#DCD5C9] bg-white hover:border-[#8A9B84]/50'
               }`}
               title={item.inStock ? 'Mark out of stock' : 'Mark in stock'}
             >
-              {item.inStock && <Check className="w-3.5 h-3.5" />}
+              {item.inStock && <Check className="w-4 h-4" />}
             </button>
             <span className={`flex-1 min-w-0 text-base font-medium ${item.inStock ? 'text-[#171714]' : 'text-[#6E6A61] line-through'}`}>
               {item.name}
