@@ -38,11 +38,28 @@ export const AddMealModal: React.FC<AddMealModalProps> = ({
   const [mealType, setMealType] = useState<MealType>('dinner');
   const [isQuick, setIsQuick] = useState(false);
   const [cookingTime, setCookingTime] = useState<number>(30);
-  const [plate, setPlate] = useState<PlateComponent[]>([
-    { role: 'STAPLE', name: 'Ugali' },
-    { role: 'PROTEIN', name: 'Beef Stew' },
-    { role: 'VEGETABLE', name: 'Sukuma Wiki' },
-  ]);
+
+  const findFoodId = (needle: string): string | undefined => {
+    const item = foodItems.find(
+      (f) =>
+        f.name.toLowerCase().includes(needle.toLowerCase()) ||
+        needle.toLowerCase().includes(f.name.toLowerCase())
+    );
+    return item?.id;
+  };
+
+  const createDefaultPlate = (): PlateComponent[] => {
+    const staple = findFoodId('Ugali');
+    const protein = findFoodId('Beef Stew');
+    const vegetable = findFoodId('Sukuma');
+    return [
+      { role: 'STAPLE', name: 'Ugali', foodItemId: staple },
+      { role: 'PROTEIN', name: 'Beef Stew', foodItemId: protein },
+      { role: 'VEGETABLE', name: 'Sukuma Wiki', foodItemId: vegetable },
+    ];
+  };
+
+  const [plate, setPlate] = useState<PlateComponent[]>(createDefaultPlate);
 
   const getFoodLabel = (item: { name: string; parentId?: string }) => {
     if (item.parentId) {
@@ -104,11 +121,7 @@ export const AddMealModal: React.FC<AddMealModalProps> = ({
     setMealType('dinner');
     setIsQuick(false);
     setCookingTime(30);
-    setPlate([
-      { role: 'STAPLE', name: 'Ugali' },
-      { role: 'PROTEIN', name: 'Beef Stew' },
-      { role: 'VEGETABLE', name: 'Sukuma Wiki' },
-    ]);
+    setPlate(createDefaultPlate());
     onClose();
   };
 
@@ -124,7 +137,7 @@ export const AddMealModal: React.FC<AddMealModalProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Ndengu Mukimo + Beef Stew + Cabbage"
-            className="w-full min-h-11 px-3 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
+            className="w-full min-h-12 px-4 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-xl focus:outline-none focus:border-[#8A9B84] focus:ring-4 focus:ring-[#8A9B84]/10"
             required
             autoFocus
           />
@@ -138,7 +151,7 @@ export const AddMealModal: React.FC<AddMealModalProps> = ({
             <select
               value={mealType}
               onChange={(e) => setMealType(e.target.value as MealType)}
-              className="w-full min-h-11 px-3 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
+              className="w-full min-h-12 px-4 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-xl focus:outline-none focus:border-[#8A9B84] focus:ring-4 focus:ring-[#8A9B84]/10"
             >
               <option value="dinner">Dinner</option>
               <option value="lunch">Lunch</option>
@@ -157,7 +170,7 @@ export const AddMealModal: React.FC<AddMealModalProps> = ({
               onChange={(e) => setCookingTime(Number(e.target.value))}
               min="5"
               max="180"
-              className="w-full min-h-11 px-3 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
+              className="w-full min-h-12 px-4 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-xl focus:outline-none focus:border-[#8A9B84] focus:ring-4 focus:ring-[#8A9B84]/10"
             />
           </div>
         </div>
@@ -190,7 +203,7 @@ export const AddMealModal: React.FC<AddMealModalProps> = ({
                     onChange={(e) =>
                       handleUpdateComponent(idx, { role: e.target.value as PlateRole })
                     }
-                    className="w-28 min-h-11 px-2 border border-[#DCD5C9] bg-white text-xs text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
+                    className="w-28 min-h-12 px-2 border border-[#DCD5C9] bg-white text-xs text-[#171714] rounded-xl focus:outline-none focus:border-[#8A9B84]"
                   >
                     {ROLES.map((r) => (
                       <option key={r} value={r}>
@@ -203,7 +216,7 @@ export const AddMealModal: React.FC<AddMealModalProps> = ({
                     <select
                       value={comp.foodItemId || ''}
                       onChange={(e) => handleFoodSelect(idx, e.target.value)}
-                      className="flex-1 min-h-11 px-2 border border-[#DCD5C9] bg-white text-xs text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
+                      className="flex-1 min-h-12 px-2 border border-[#DCD5C9] bg-white text-xs text-[#171714] rounded-xl focus:outline-none focus:border-[#8A9B84]"
                     >
                       <option value="">Custom name...</option>
                       {availableFoods.map((f) => (
@@ -220,7 +233,7 @@ export const AddMealModal: React.FC<AddMealModalProps> = ({
                       value={comp.name}
                       onChange={(e) => handleUpdateComponent(idx, { name: e.target.value })}
                       placeholder="Component name (e.g. Ugali)"
-                      className="flex-1 min-h-11 px-3 border border-[#DCD5C9] bg-white text-xs text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
+                      className="flex-1 min-h-12 px-3 border border-[#DCD5C9] bg-white text-xs text-[#171714] rounded-xl focus:outline-none focus:border-[#8A9B84]"
                       required
                     />
                   )}
@@ -246,7 +259,7 @@ export const AddMealModal: React.FC<AddMealModalProps> = ({
               type="checkbox"
               checked={isQuick}
               onChange={(e) => setIsQuick(e.target.checked)}
-              className="w-4 h-4 rounded-[2px] accent-[#8A9B84]"
+              className="w-5 h-5 rounded-md accent-[#8A9B84]"
             />
             <span>Mark as quick meal for &quot;Keep It Easy&quot; filter</span>
           </label>
