@@ -59,7 +59,7 @@ export default function ShoppingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F3EC] flex flex-col pb-24 md:pb-0">
+    <div className="min-h-screen bg-[#F7F3EC] flex flex-col pb-24 lg:pb-0">
       <Header />
       <main className="container-editorial w-full max-w-5xl flex-1 py-10 sm:py-14 md:py-20 space-y-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
