@@ -76,7 +76,7 @@ export const AddFoodItemModal: React.FC<AddFoodItemModalProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Ndengu Mukimo, Beef Stew Meat, Sukuma Wiki"
-            className="w-full min-h-11 px-3 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
+            className="w-full min-h-12 px-4 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-xl focus:outline-none focus:border-[#8A9B84] focus:ring-4 focus:ring-[#8A9B84]/10"
             required
             autoFocus
           />
@@ -89,7 +89,7 @@ export const AddFoodItemModal: React.FC<AddFoodItemModalProps> = ({
           <select
             value={category}
             onChange={(e) => handleCategoryChange(e.target.value as FoodCategory)}
-            className="w-full min-h-11 px-3 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
+            className="w-full min-h-12 px-4 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-xl focus:outline-none focus:border-[#8A9B84] focus:ring-4 focus:ring-[#8A9B84]/10"
           >
             {CATEGORIES.map((c) => (
               <option key={c.value} value={c.value}>
@@ -107,7 +107,7 @@ export const AddFoodItemModal: React.FC<AddFoodItemModalProps> = ({
             <select
               value={parentId}
               onChange={(e) => setParentId(e.target.value)}
-              className="w-full min-h-11 px-3 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-[2px] focus:outline-none focus:border-[#8A9B84]"
+              className="w-full min-h-12 px-4 border border-[#DCD5C9] bg-white text-sm text-[#171714] rounded-xl focus:outline-none focus:border-[#8A9B84] focus:ring-4 focus:ring-[#8A9B84]/10"
             >
               <option value="">Standalone (no variant group)</option>
               {filteredParents.map((p) => (
@@ -128,7 +128,7 @@ export const AddFoodItemModal: React.FC<AddFoodItemModalProps> = ({
               type="checkbox"
               checked={inStock}
               onChange={(e) => setInStock(e.target.checked)}
-              className="w-4 h-4 rounded-[2px] accent-[#8A9B84]"
+              className="w-5 h-5 rounded-md accent-[#8A9B84]"
             />
             <span>Currently in stock in the kitchen</span>
           </label>
