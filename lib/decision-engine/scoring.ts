@@ -1,6 +1,6 @@
 import { FoodItem, Meal } from '@/lib/types';
 import { DecisionCriteria, ScoredMealCandidate } from './types';
-import { FOOD_VARIANTS, isFoodAppropriateForMeal } from '@/lib/data/food-taxonomy';
+import { FOOD_VARIANTS, isFoodAppropriateForMeal, getFoodMealTypes, isFoodAllowedForTargetMeal } from '@/lib/data/food-taxonomy';
 
 export function calculateRecencyPenalty(lastCookedStr?: string, targetDate: Date = new Date()): number {
   if (!lastCookedStr) return 0;
@@ -89,6 +89,19 @@ export function scoreMealCandidate(
   if (meal.isExcluded) return null;
   if (criteria.neverMealIds?.includes(meal.id)) return null;
   if (criteria.excludedMealIds?.includes(meal.id)) return null;
+
+  // Strict meal separation: never serve a meal whose plate contains a food
+  // that is off-limits for the requested meal type (e.g. breakfast-only items
+  // must not appear in lunch or dinner).
+  if (criteria.mealType && criteria.mealType !== 'any') {
+    const hasInappropriateFood = meal.plate.some((comp) => {
+      if (!comp.foodItemId) return false;
+      const food = foodItems.find((f) => f.id === comp.foodItemId);
+      if (!food) return false;
+      return !isFoodAllowedForTargetMeal(getFoodMealTypes(food), criteria.mealType!);
+    });
+    if (hasInappropriateFood) return null;
+  }
 
   const activeStockMap = new Map<string, boolean>();
 
