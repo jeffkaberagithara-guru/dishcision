@@ -13,7 +13,7 @@ export default function SettingsPage() {
   const [confirmingReset, setConfirmingReset] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F7F3EC] flex flex-col pb-24 md:pb-0">
+    <div className="min-h-screen bg-[#F7F3EC] flex flex-col pb-24 lg:pb-0">
       <Header />
       <main className="container-editorial w-full max-w-3xl flex-1 py-10 sm:py-14 md:py-20 space-y-8">
         <div className="space-y-2">
