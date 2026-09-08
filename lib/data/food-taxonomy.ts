@@ -260,3 +260,45 @@ export function isFoodAppropriateForMeal(foodMealTypes: MealType[], targetMealTy
   if (targetMealType === 'any') return true;
   return foodMealTypes.includes(targetMealType) || foodMealTypes.includes('any');
 }
+
+/**
+ * Resolve the meal types a food item is suited for, using the taxonomy
+ * (variant metadata first, then its parent group). Foods with no mapping
+ * are treated as neutral (suitable anywhere).
+ */
+export function getFoodMealTypes(food: { id: string; parentId?: string }): MealType[] {
+  const variant = FOOD_VARIANTS.find((v) => v.id === food.id);
+  if (variant && variant.mealTypes.length > 0) return variant.mealTypes;
+  if (food.parentId) {
+    const parent = FOOD_PARENTS.find((p) => p.id === food.parentId);
+    if (parent && parent.mealTypes.length > 0) return parent.mealTypes;
+  }
+  return [];
+}
+
+/**
+ * Strict meal separation:
+ * - Breakfast is its own menu. Only breakfast-type foods (or neutral ones)
+ *   may be used for breakfast; main-meal foods are kept out.
+ * - Lunch and dinner are interchangeable. Anything that is not strictly
+ *   breakfast-only (i.e. includes lunch, dinner, or any) is allowed.
+ */
+export function isFoodAllowedForTargetMeal(
+  foodMealTypes: MealType[],
+  targetMealType: MealType
+): boolean {
+  if (!targetMealType || targetMealType === 'any') return true;
+  if (foodMealTypes.length === 0) return true; // unclassified foods are neutral
+
+  const isMainFood =
+    foodMealTypes.includes('lunch') ||
+    foodMealTypes.includes('dinner') ||
+    foodMealTypes.includes('any');
+
+  if (targetMealType === 'breakfast') {
+    return foodMealTypes.includes('breakfast');
+  }
+
+  // Lunch or dinner — never let breakfast-only foods spill over.
+  return isMainFood;
+}
