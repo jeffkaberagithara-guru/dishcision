@@ -266,13 +266,13 @@ export const FoodStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         : [];
 
       const mergedCriteria: DecisionCriteria = {
+        ...options,
         excludedMealIds: [
           ...excludeCurrent,
           ...temporaryExcludedMealIds,
           ...(options.excludedMealIds || []),
         ],
         keepItEasy: options.keepItEasy ?? settings.keepItEasyDefault,
-        ...options,
       };
 
       const result = makeDishcision(meals, foodItems, mergedCriteria);
