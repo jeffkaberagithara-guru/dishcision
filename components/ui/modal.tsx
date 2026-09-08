@@ -36,34 +36,39 @@ export const Modal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       <div
         className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
         onClick={onClose}
+        aria-hidden="true"
       />
-      <div
-        className={cn(
-          "relative w-full max-w-lg bg-[#F7F3EC] border border-[#DCD5C9] p-6 shadow-xl rounded-2xl z-10 space-y-4",
-          className,
-        )}
-      >
-        <div className="flex items-center justify-between border-b border-[#DCD5C9] pb-3">
-          {title ? (
-            <h3 className="font-serif text-2xl text-[#171714] font-normal">
-              {title}
-            </h3>
-          ) : (
-            <div />
+      <div className="relative flex min-h-full items-center justify-center p-4 sm:p-6">
+        <div
+          role="dialog"
+          aria-modal="true"
+          className={cn(
+            "relative w-full max-w-lg bg-[#F7F3EC] border border-[#DCD5C9] p-5 sm:p-6 shadow-xl rounded-2xl z-10 space-y-4 max-h-[calc(100dvh-2rem)] overflow-y-auto",
+            className,
           )}
-          <button
-            onClick={onClose}
-            className="p-1 text-[#6E6A61] hover:text-[#171714] transition-colors"
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5" />
-          </button>
+        >
+          <div className="flex items-center justify-between border-b border-[#DCD5C9] pb-3">
+            {title ? (
+              <h3 className="font-serif text-2xl text-[#171714] font-normal">
+                {title}
+              </h3>
+            ) : (
+              <div />
+            )}
+            <button
+              onClick={onClose}
+              className="p-1 text-[#6E6A61] hover:text-[#171714] transition-colors"
+              aria-label="Close modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div>{children}</div>
         </div>
-        <div>{children}</div>
       </div>
     </div>
   );
