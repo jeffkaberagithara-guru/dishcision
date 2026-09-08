@@ -8,8 +8,14 @@ import { Footer } from '@/components/layout/footer';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { BigMealReveal } from '@/components/today/big-meal-reveal';
 import { useFoodStore } from '@/lib/store/use-food-store';
-import type { DecisionResult } from '@/lib/types';
-import { Shuffle, Zap } from 'lucide-react';
+import type { DecisionResult, MealType } from '@/lib/types';
+import { Shuffle, Zap, Sunrise, Sun, Moon } from 'lucide-react';
+
+const MEAL_CHOICES: { type: Extract<MealType, 'breakfast' | 'lunch' | 'dinner'>; label: string; icon: typeof Sunrise }[] = [
+  { type: 'breakfast', label: 'Breakfast', icon: Sunrise },
+  { type: 'lunch', label: 'Lunch', icon: Sun },
+  { type: 'dinner', label: 'Dinner', icon: Moon },
+];
 
 export default function HomePage() {
   const { isLoaded, makeNewDecision, acceptCurrentDecision } = useFoodStore();
@@ -18,6 +24,13 @@ export default function HomePage() {
   const [isThinking, setIsThinking] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
   const [decision, setDecision] = useState<DecisionResult | null>(null);
+  const [mealType, setMealType] = useState<Extract<MealType, 'breakfast' | 'lunch' | 'dinner'>>(() => {
+    // Default to the current meal period — the picker always lets you change it.
+    const h = new Date().getHours();
+    if (h < 10) return 'breakfast';
+    if (h < 15) return 'lunch';
+    return 'dinner';
+  });
   const shownIdsRef = useRef<Set<string>>(new Set());
 
   // Fast, one-tap balanced surprise — never repeats within a session.
@@ -28,14 +41,14 @@ export default function HomePage() {
     // Defer so the thinking pulse is visible before the synchronous engine returns
     requestAnimationFrame(() => {
       const exclusions = Array.from(shownIdsRef.current);
-      const result = makeNewDecision({ mealType: 'any', excludedMealIds: exclusions });
+      const result = makeNewDecision({ mealType, excludedMealIds: exclusions });
       if (result && result.meal && result.meal.id) {
         shownIdsRef.current.add(result.meal.id);
         setDecision(result);
       }
       setIsThinking(false);
     });
-  }, [makeNewDecision]);
+  }, [makeNewDecision, mealType]);
 
   const handleCookThis = useCallback(() => {
     if (!decision) return;
@@ -94,8 +107,38 @@ export default function HomePage() {
                     <span className="italic text-[#8A9B84] block">today?</span>
                   </h1>
                   <p className="font-serif italic text-xl sm:text-2xl text-[#6E6A61]">
-                    Tap the button and get a balanced meal — instantly.
+                    Pick your meal, then get a balanced surprise.
                   </p>
+                </div>
+
+                {/* Meal-type picker — the engine only suggests foods for this meal */}
+                <div className="w-full max-w-xl" role="radiogroup" aria-label="Choose a meal">
+                  <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                    {MEAL_CHOICES.map((choice) => {
+                      const Icon = choice.icon;
+                      const isActive = mealType === choice.type;
+                      return (
+                        <button
+                          key={choice.type}
+                          role="radio"
+                          aria-checked={isActive}
+                          onClick={() => setMealType(choice.type)}
+                          className={`group relative flex flex-col items-center gap-3 rounded-2xl border-2 px-4 py-6 sm:py-8 transition-all duration-200 cursor-pointer
+                            ${isActive
+                              ? 'border-[#8A9B84] bg-[#8A9B84]/10 text-[#171714] shadow-sm'
+                              : 'border-[#DCD5C9] bg-white text-[#6E6A61] hover:border-[#8A9B84]/60 hover:text-[#171714]'}`}
+                        >
+                          <Icon className={`w-8 h-8 sm:w-10 sm:h-10 transition-colors ${isActive ? 'text-[#8A9B84]' : 'text-[#8A9B84]/60 group-hover:text-[#8A9B84]'}`} />
+                          <span className="font-serif text-lg sm:text-xl font-semibold">
+                            {choice.label}
+                          </span>
+                          <span className="text-[10px] uppercase tracking-[0.18em] font-sans font-semibold text-[#6E6A61]/70">
+                            {isActive ? 'Selected' : 'Choose'}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <motion.button
@@ -103,13 +146,13 @@ export default function HomePage() {
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  className="group relative grid place-items-center size-52 sm:size-72 rounded-full bg-[#171714] text-[#F7F3EC] shadow-2xl cursor-pointer focus-visible:outline-4 focus-visible:outline-[#8A9B84]"
-                  aria-label="Surprise me with a balanced meal"
+                  className="group relative grid place-items-center size-52 sm:size-64 rounded-full bg-[#171714] text-[#F7F3EC] shadow-2xl cursor-pointer focus-visible:outline-4 focus-visible:outline-[#8A9B84]"
+                  aria-label={`Surprise me with a ${mealType} meal`}
                 >
                   <span className="absolute inset-0 rounded-full border-2 border-[#8A9B84]/40" />
                   <span className="flex flex-col items-center gap-2 px-6">
-                    <Shuffle className="w-12 h-12 sm:w-16 sm:h-16 transition-transform duration-500 group-hover:rotate-180" />
-                    <span className="font-serif text-3xl sm:text-4xl font-semibold">
+                    <Shuffle className="w-10 h-10 sm:w-14 sm:h-14 transition-transform duration-500 group-hover:rotate-180" />
+                    <span className="font-serif text-2xl sm:text-3xl font-semibold">
                       Surprise
                       <span className="block text-[#8A9B84]">Me</span>
                     </span>
@@ -118,7 +161,8 @@ export default function HomePage() {
 
                 <p className="text-base sm:text-lg text-[#6E6A61] font-sans flex items-center gap-2">
                   <Zap className="w-5 h-5 text-[#8A9B84]" />
-                  One tap · Balanced · Never repeats
+                  {mealType === 'breakfast' ? 'Breakfast menu' : `${mealType === 'lunch' ? 'Lunch' : 'Dinner'} menu`}
+                  {' · '}Balanced{mealType === 'breakfast' ? ' · ' : ' · '}Never repeats
                 </p>
 
                 {/* Minimal secondary access */}
@@ -161,7 +205,7 @@ export default function HomePage() {
                   <div className="space-y-5">
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-[11px] uppercase tracking-[0.25em] text-[#8A9B84] font-sans font-semibold">
-                        Here&apos;s your meal
+                        {mealType === 'breakfast' ? "Here's your breakfast" : mealType === 'lunch' ? "Here's your lunch" : "Here's your dinner"}
                       </span>
                       <button
                         onClick={resetToIdle}
